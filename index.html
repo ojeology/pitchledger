@@ -156,7 +156,7 @@
   <section id="tab-settings" class="tab"></section>
 </main>
 <div id="modal"></div>
-<div class="footer">PitchLedger v2.1 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
+<div class="footer">PitchLedger v2.2 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
 <script>
 "use strict";
 /* ================= STORAGE ================= */
@@ -272,7 +272,9 @@ function seed(){
       {id:"moneypantry",name:"MoneyPantry",tier:2,pay:"$50–300/article",how:"Pitch personal finance articles",link:"https://moneypantry.com/write-for-us",status:"not-started",notes:"Finance niche — your hustle/money story fits."},
       {id:"mentalfloss",name:"Mental Floss",tier:2,pay:"$150+",how:"Pitch interesting facts/trivia",link:"https://www.mentalfloss.com",status:"not-started",notes:"Verify international eligibility before pitching."},
       {id:"inkitt",name:"Inkitt",tier:2,pay:"Contests + contracts",how:"Upload novel, enter contests",link:"https://www.inkitt.com",status:"not-started",notes:"Free fiction platform with writing contests + book contracts."},
-      {id:"hubpages",name:"HubPages",tier:2,pay:"Ad revenue share",how:"Publish evergreen articles",link:"https://hubpages.com",status:"not-started",notes:"Passive income, PayPal monthly."}
+      {id:"hubpages",name:"HubPages",tier:2,pay:"Ad revenue share",how:"Publish evergreen articles",link:"https://hubpages.com",status:"not-started",notes:"Passive income, PayPal monthly."},
+      {id:"aeon",name:"Aeon",tier:3,pay:"Honorarium ~$550; pro fees up to $1,500–2,500",how:"Pitch big-idea essays (2,000–6,000 words) via aeon.co/pitch — pitches only, no drafts",link:"https://aeon.co/pitch",status:"watchlist",notes:"⚠️ CURRENTLY CLOSED for pitches — watch for reopening. Fees set for your country of residence (international OK). Noema backup: the AI-education-infrastructure thesis, global scope. No news/rebuttals/reviews."},
+      {id:"upworthy",name:"Upworthy",tier:2,pay:"~$0.23–0.35/word (~$185–280 per 800 words)",how:"Pitch via their online pitch form; positive human-interest stories",link:"https://www.upworthy.com",status:"not-started",notes:"✅ Pay confirmed. ⚠️ International eligibility + payment method UNVERIFIED — confirm before submitting. Your recovery/hope story (not the dark side) fits their mission."}
     ],
     boxes:[
       {id:"afrolicious",name:"Afrolicious",status:"OPEN",claim:"AI gives young Africans without traditional tech access a genuine path into software.",kit:["The decision to learn — the trigger","The phone as the only tool (backdrop only)","First successful build — the proof","Laughed at → earned respect","Fortebet Learning as the CLIMAX"],offLimits:["NumPy battle / power cuts / data costs","The word 'shortcuts'","The bridge, ₦98k, ₦500k","'AI won't replace ambition' ending","Infrastructure/compression thesis"]},
@@ -676,6 +678,26 @@ document.addEventListener("click",function(e){
   var f=e.target.getAttribute("data-filter");
   if(f){ filter=f; renderOutlets(); }
   var o=e.target.getAttribute("data-oppfilter");
+  if(o!==null){ oppFilter=+o; renderOpps(); }
+  var tb=e.target.getAttribute("data-tab");
+  if(tb){ switchTab(tb); }
+});
+function switchTab(name){
+  document.querySelectorAll(".tabbtn").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-tab")===name);});
+  document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("on",s.id==="tab-"+name);});
+}
+function renderAll(){
+  document.getElementById("appName").textContent=state.appName||"PitchLedger";
+  renderStats(); renderToday(); renderOutlets(); renderDrafts(); renderOpps(); renderSettings();
+}
+state=load();
+renderAll();
+setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
+try{ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); } }catch(e){}
+</script>
+</body>
+</html>
+o=e.target.getAttribute("data-oppfilter");
   if(o!==null){ oppFilter=+o; renderOpps(); }
   var tb=e.target.getAttribute("data-tab");
   if(tb){ switchTab(tb); }
