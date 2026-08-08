@@ -156,7 +156,7 @@
   <section id="tab-settings" class="tab"></section>
 </main>
 <div id="modal"></div>
-<div class="footer">PitchLedger v2 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
+<div class="footer">PitchLedger v2.1 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
 <script>
 "use strict";
 /* ================= STORAGE ================= */
@@ -234,7 +234,17 @@ function seed(){
        offLimits:"The bridge scene · 'shortcuts' thesis · ₦98k/₦500k numbers (Byline)",
        wordCount:"800–1,500",pay:"$400–500",payMethod:"Bank",
        notes:"Needs a 'why now' hook. Vox may ask for a full draft within days.",
-       publishedLink:"",log:[]}
+       publishedLink:"",log:[]},
+      {id:"whatculture",name:"WhatCulture",website:"https://whatculture.com/write-for-us",type:"Listicle",status:"PITCHED",box:"OPEN",
+       pitchDate:"2026-08-08",nudgeDays:14,closeDays:28,editorName:"Editorial team",editorEmail:"",
+       claim:"£40 per list article (film/TV/gaming/music/comics), PayPal, no experience needed, unlimited articles.",
+       kit:"Listicles only — entertainment topics, 1,500+ words, 100% original, pitched through their dashboard.",
+       offLimits:"Essay material (Afrolicious, Byline, Vox scenes) stays out of listicles. No republishing sold articles.",
+       wordCount:"1,500+",pay:"£40/article (~$50) + revenue share",payMethod:"PayPal",
+       notes:"LOCKED IN. Signed up 8 Aug. Pitch 3 list ideas this week. Approved articles paid at start of next month. No AI in content creation (check policy).",
+       publishedLink:"",log:[
+         {d:"2026-08-08",e:"Locked in — decided to commit. Sign up + pitch list ideas this week."}
+       ]}
     ],
     opps:[
       {id:"medium",name:"Medium (Partner Program)",tier:1,pay:"Yes — earns from member reads (Nigeria eligible)",how:"Join MPP, publish 1 story, link Stripe",link:"https://medium.com",status:"not-started",notes:"Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."},
@@ -251,7 +261,18 @@ function seed(){
       {id:"kdp",name:"Amazon KDP (self-publish)",tier:2,pay:"70% royalties",how:"Upload book; AI-generated needs private disclosure",link:"https://kdp.amazon.com",status:"not-started",notes:"Fantasy sells best. Payoneer → naira."},
       {id:"okadabooks",name:"OkadaBooks (Nigerian)",tier:2,pay:"70% royalties, naira bank transfer",how:"Upload your book, sell to Nigerian readers",link:"https://okadabooks.com",status:"not-started",notes:"Readers pay via airtime. Instant Nigerian presence."},
       {id:"clarkesworld",name:"Clarkesworld",tier:3,pay:"14¢/word",how:"Online tracker only; no simultaneous subs; no AI",link:"https://clarkesworldmagazine.com/submissions/",status:"watchlist",notes:"~1% acceptance. Read 10 stories first. Nigerian voices winning."},
-      {id:"commonwealth",name:"Commonwealth Short Story Prize",tier:3,pay:"£5,000 overall / £2,500 regional",how:"Free entry ~1 Nov; 2,000–5,000 words; fantasy OK",link:"https://commonwealthfoundation.com",status:"watchlist",notes:"Nigeria eligible. Winners published in Granta."}
+      {id:"commonwealth",name:"Commonwealth Short Story Prize",tier:3,pay:"£5,000 overall / £2,500 regional",how:"Free entry ~1 Nov; 2,000–5,000 words; fantasy OK",link:"https://commonwealthfoundation.com",status:"watchlist",notes:"Nigeria eligible. Winners published in Granta."},
+      {id:"textbroker",name:"Textbroker",tier:1,pay:"$0.01–0.09/word, weekly PayPal",how:"Sign up, pass quality test, pick orders",link:"https://www.textbroker.com",status:"not-started",notes:"Open internationally. Low pay but instant work + reviews. Content mill."},
+      {id:"problogger",name:"ProBlogger Job Board",tier:1,pay:"Varies ($50–500+/job)",how:"Free job board — browse listings, apply with samples",link:"https://problogger.com/jobs",status:"not-started",notes:"Best board for remote content gigs; check each ad's international policy."},
+      {id:"konnectng",name:"Konnect Ng",tier:1,pay:"Naira weekly",how:"Sign up, write articles + surveys",link:"https://konnectng.com",status:"not-started",notes:"Nigerian platform, PayPal/bank, weekly. Beginners + students."},
+      {id:"constantcontent",name:"Constant Content",tier:2,pay:"$5–100+/article (you set price)",how:"Submit articles to marketplace, clients buy",link:"https://www.constant-content.com",status:"not-started",notes:"You keep rights until sold; set your own price."},
+      {id:"verblio",name:"Verblio",tier:2,pay:"$15–80/post",how:"Apply, then claim assignments",link:"https://verblio.com",status:"not-started",notes:"Steady blog work; quality-based."},
+      {id:"writeraccess",name:"WriterAccess",tier:2,pay:"$0.10–0.30/word",how:"Apply + niche test",link:"https://www.writeraccess.com",status:"not-started",notes:"Badges raise your rate; monthly payouts."},
+      {id:"contra",name:"Contra",tier:2,pay:"You set rate — 0% commission",how:"Create portfolio, apply to gigs",link:"https://contra.com",status:"not-started",notes:"Keep 100% of earnings. Needs samples."},
+      {id:"moneypantry",name:"MoneyPantry",tier:2,pay:"$50–300/article",how:"Pitch personal finance articles",link:"https://moneypantry.com/write-for-us",status:"not-started",notes:"Finance niche — your hustle/money story fits."},
+      {id:"mentalfloss",name:"Mental Floss",tier:2,pay:"$150+",how:"Pitch interesting facts/trivia",link:"https://www.mentalfloss.com",status:"not-started",notes:"Verify international eligibility before pitching."},
+      {id:"inkitt",name:"Inkitt",tier:2,pay:"Contests + contracts",how:"Upload novel, enter contests",link:"https://www.inkitt.com",status:"not-started",notes:"Free fiction platform with writing contests + book contracts."},
+      {id:"hubpages",name:"HubPages",tier:2,pay:"Ad revenue share",how:"Publish evergreen articles",link:"https://hubpages.com",status:"not-started",notes:"Passive income, PayPal monthly."}
     ],
     boxes:[
       {id:"afrolicious",name:"Afrolicious",status:"OPEN",claim:"AI gives young Africans without traditional tech access a genuine path into software.",kit:["The decision to learn — the trigger","The phone as the only tool (backdrop only)","First successful build — the proof","Laughed at → earned respect","Fortebet Learning as the CLIMAX"],offLimits:["NumPy battle / power cuts / data costs","The word 'shortcuts'","The bridge, ₦98k, ₦500k","'AI won't replace ambition' ending","Infrastructure/compression thesis"]},
@@ -269,7 +290,8 @@ function seed(){
       {t:"Pitch TechCabal ($175) + Zikoko (pays)",done:false},
       {t:"Apply: African Arguments fellowship (~$250/article)",done:false},
       {t:"2 new pitches every 2 weeks — next batch ~21 Aug",done:false},
-      {t:"Deploy PitchLedger to GitHub Pages",done:false}
+      {t:"Deploy PitchLedger to GitHub Pages",done:false},
+      {t:"WhatCulture: sign up + pitch 3 listicle ideas (locked in)",done:false}
     ],
     drafts:[
       {id:"d-afrolicious",title:"Afrolicious — essay outline (ready to write)",outlet:"Afrolicious",updated:"2026-08-07",text:"THE IDEA: AI is giving young Africans without traditional tech access a genuine path into software.\n\nYOUR MATERIAL (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nDON'T USE (belongs to other stories):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING ideas (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING: access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not a slogan.\n\nLength: 1,000–1,500 words. Paste your draft here and it saves itself."}
