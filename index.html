@@ -156,7 +156,7 @@
   <section id="tab-settings" class="tab"></section>
 </main>
 <div id="modal"></div>
-<div class="footer">PitchLedger v2.2 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
+<div class="footer">PitchLedger v2.3 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
 <script>
 "use strict";
 /* ================= STORAGE ================= */
@@ -244,6 +244,16 @@ function seed(){
        notes:"LOCKED IN. Signed up 8 Aug. Pitch 3 list ideas this week. Approved articles paid at start of next month. No AI in content creation (check policy).",
        publishedLink:"",log:[
          {d:"2026-08-08",e:"Locked in — decided to commit. Sign up + pitch list ideas this week."}
+       ]},
+      {id:"wonderslist",name:"WondersList",website:"https://www.wonderslist.com/write-us/",type:"Listicle",status:"PITCHED",box:"OPEN",
+       pitchDate:"2026-08-08",nudgeDays:7,closeDays:21,editorName:"WondersList team",editorEmail:"admin@wonderslist.com",
+       claim:"Top 10 Most Unbelievable Sports Moments of All Time — first paid article ($5).",
+       kit:"Sports listicle: 10 items ranked #10→#1, 1,500+ words, every fact verified with source links.",
+       offLimits:"They own the article forever after publication — never republish it anywhere.",
+       wordCount:"1,511",pay:"$5",payMethod:"PayPal (sodiqibrahim30@gmail.com)",
+       notes:"SENT 8 Aug 2026. Their page: reply ~48h for queries, acceptance a few days, $5 lands within 1–2 weeks. If silent after 7 days, one gentle follow-up, then close at 21 days.",
+       publishedLink:"",log:[
+         {d:"2026-08-08",e:"Article sent to admin@wonderslist.com — FIRST PAID SUBMISSION 🎯"}
        ]}
     ],
     opps:[
@@ -293,7 +303,8 @@ function seed(){
       {t:"Apply: African Arguments fellowship (~$250/article)",done:false},
       {t:"2 new pitches every 2 weeks — next batch ~21 Aug",done:false},
       {t:"Deploy PitchLedger to GitHub Pages",done:false},
-      {t:"WhatCulture: sign up + pitch 3 listicle ideas (locked in)",done:false}
+      {t:"WhatCulture: sign up + pitch 3 listicle ideas (locked in)",done:false},
+      {t:"WondersList article sent — first paid submission ✅",done:true}
     ],
     drafts:[
       {id:"d-afrolicious",title:"Afrolicious — essay outline (ready to write)",outlet:"Afrolicious",updated:"2026-08-07",text:"THE IDEA: AI is giving young Africans without traditional tech access a genuine path into software.\n\nYOUR MATERIAL (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nDON'T USE (belongs to other stories):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING ideas (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING: access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not a slogan.\n\nLength: 1,000–1,500 words. Paste your draft here and it saves itself."}
@@ -342,6 +353,7 @@ function urgency(o){
   if(d<0) return {level:"red",label:"Send the reminder now",days:d};
   if(d===0) return {level:"red",label:"Send the reminder today",days:0};
   if(d<=7) return {level:"amber",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
+  return {level:"ok",lablabel:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
   return {level:"ok",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
 }
 function cardClass(o){
@@ -714,6 +726,10 @@ state=load();
 renderAll();
 setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
 try{ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); } }catch(e){}
+</script>
+</body>
+</html>
+egister("sw.js").catch(function(){}); } }catch(e){}
 </script>
 </body>
 </html>
