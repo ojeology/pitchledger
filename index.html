@@ -4,113 +4,134 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e1116">
-<meta name="description" content="PitchLedger — track every pitch, deadline, nudge, box and clip.">
+<meta name="description" content="PitchLedger — your simple writing tracker. Pitches, reminders, drafts, and ideas.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1116'/%3E%3Ctext x='32' y='42' font-size='30' text-anchor='middle' fill='%2334d399' font-family='sans-serif' font-weight='bold'%3EPL%3C/text%3E%3C/svg%3E">
 <title>PitchLedger</title>
 <style>
   :root{
-    --bg:#0e1116; --card:#161b24; --card2:#1c2230; --line:#262e3f;
-    --txt:#e8ecf4; --dim:#8b94a7; --accent:#34d399; --amber:#fbbf24; --red:#f87171;
-    --blue:#60a5fa; --purple:#a78bfa; --pink:#f472b6;
+    --bg:#0e1116; --card:#171d28; --card2:#1f2634; --line:#2a3345;
+    --txt:#eef1f7; --dim:#9aa4b8; --accent:#34d399; --amber:#fbbf24; --red:#f87171;
+    --blue:#7aa8f7; --purple:#b39dfa; --ok:#34d399;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",sans-serif;font-size:15px;line-height:1.45}
-  body{padding-bottom:90px}
-  header{position:sticky;top:0;z-index:20;background:rgba(14,17,22,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px}
-  .brand{font-weight:800;font-size:18px;letter-spacing:.3px}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",sans-serif;font-size:16px;line-height:1.55}
+  body{padding-bottom:96px}
+  header{position:sticky;top:0;z-index:20;background:rgba(14,17,22,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px}
+  .brand{font-weight:800;font-size:20px;letter-spacing:.2px}
   .brand .dot{color:var(--accent)}
-  #stats{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 8px}
-  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--dim)}
+  #stats{display:flex;gap:8px;flex-wrap:wrap;padding:4px 16px 8px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12.5px;color:var(--dim)}
   .chip b{color:var(--txt)}
-  nav{display:flex;overflow-x:auto;gap:4px;padding:0 10px 8px;scrollbar-width:none}
+  .chip.warn{color:var(--red);border-color:var(--red)}
+  nav{display:flex;overflow-x:auto;gap:6px;padding:0 12px 10px;scrollbar-width:none}
   nav::-webkit-scrollbar{display:none}
-  .tabbtn{flex:1;min-width:88px;border:1px solid transparent;background:transparent;color:var(--dim);padding:8px 6px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .tabbtn{flex:1;min-width:104px;border:1px solid transparent;background:transparent;color:var(--dim);padding:10px 6px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   .tabbtn.on{background:var(--card2);color:var(--accent);border-color:var(--line)}
-  main{max-width:760px;margin:0 auto;padding:12px 12px 0}
+  main{max-width:640px;margin:0 auto;padding:14px 14px 0}
   .tab{display:none}
   .tab.on{display:block}
-  h2{font-size:16px;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
-  h2 .count{font-size:12px;color:var(--dim);font-weight:600}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
-  .card.redbar{border-left:4px solid var(--red)}
-  .card.amberbar{border-left:4px solid var(--amber)}
-  .card.greenbar{border-left:4px solid var(--accent)}
-  .card.bluebar{border-left:4px solid var(--blue)}
-  .card.graybar{border-left:4px solid var(--dim)}
-  .cardrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-  .cardtitle{font-weight:700;font-size:15px}
+  h2{font-size:18px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  h2 .count{font-size:13px;color:var(--dim);font-weight:600}
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .card.redbar{border-left:5px solid var(--red)}
+  .card.amberbar{border-left:5px solid var(--amber)}
+  .card.greenbar{border-left:5px solid var(--accent)}
+  .card.bluebar{border-left:5px solid var(--blue)}
+  .card.graybar{border-left:5px solid var(--dim)}
+  .cardrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .cardtitle{font-weight:800;font-size:17px}
   .cardtitle a{color:var(--txt);text-decoration:none}
-  .cardtitle a:hover{color:var(--accent)}
-  .st{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
-  .st-PITCHED{background:#1e2a3a;color:var(--blue)}
-  .st-NUDGED1,.st-NUDGED2{background:#2a2416;color:var(--amber)}
-  .st-YES{background:#0f2a21;color:var(--accent)}
-  .st-NO,.st-CLOSED{background:#2a1616;color:var(--red)}
-  .st-PUBLISHED{background:#1c2440;color:var(--purple)}
-  .st-PAID{background:#17301f;color:#4ade80}
-  .st-PAUSED{background:#232733;color:var(--dim)}
-  .countdown{margin:8px 0 4px;font-size:13px}
-  .big{font-size:26px;font-weight:800}
-  .big.red{color:var(--red)} .big.amber{color:var(--amber)} .big.green{color:var(--accent)} .big.dim{color:var(--dim)}
-  .cd-label{color:var(--dim);font-size:12px;margin-left:4px}
-  .meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12.5px;color:var(--dim);margin:6px 0}
-  .meta b{color:var(--txt);font-weight:600}
-  .meta .full{grid-column:1/-1}
-  .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .btn{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer}
-  .btn:hover{filter:brightness(1.15)}
-  .btn.green{background:#0f2a21;border-color:#14532d;color:var(--accent)}
-  .btn.red{background:#2a1616;border-color:#7f1d1d;color:var(--red)}
-  .btn.amber{background:#2a2416;border-color:#713f12;color:var(--amber)}
-  .btn.blue{background:#16233c;border-color:#1e3a5f;color:var(--blue)}
-  .btn.dim{color:var(--dim)}
-  .btn:disabled{opacity:.45;cursor:default}
-  .log{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;font-size:12px;color:var(--dim)}
-  .log div{margin-bottom:3px}
+  .cardtitle .tiny{font-size:12px;color:var(--dim);font-weight:500}
+  .pill{display:inline-block;font-size:12px;font-weight:800;padding:4px 12px;border-radius:999px;white-space:nowrap}
+  .pill-PITCHED{background:#1d2c44;color:var(--blue)}
+  .pill-NUDGED1,.pill-NUDGED2{background:#33291a;color:var(--amber)}
+  .pill-YES{background:#10301f;color:var(--accent)}
+  .pill-NO,.pill-CLOSED{background:#331a1a;color:var(--red)}
+  .pill-PUBLISHED{background:#221d44;color:var(--purple)}
+  .pill-PAID{background:#113324;color:#4ade80}
+  .pill-PAUSED{background:#262b38;color:var(--dim)}
+  .cd{margin:12px 0 6px}
+  .cd .num{font-size:34px;font-weight:800;line-height:1.1}
+  .cd .num.red{color:var(--red)} .cd .num.amber{color:var(--amber)} .cd .num.green{color:var(--accent)} .cd .num.dim{color:var(--dim)}
+  .cd .lbl{font-size:14px;color:var(--dim);display:block}
+  .cd .sub{font-size:12.5px;color:var(--dim)}
+  .bigbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .bbtn{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:12px;padding:12px 10px;font-size:14.5px;font-weight:700;cursor:pointer;text-align:center}
+  .bbtn:hover{filter:brightness(1.15)}
+  .bbtn.green{background:#10301f;border-color:#14532d;color:var(--accent)}
+  .bbtn.red{background:#331a1a;border-color:#7f1d1d;color:var(--red)}
+  .bbtn.amber{background:#33291a;border-color:#713f12;color:var(--amber)}
+  .bbtn.blue{background:#1d2c44;border-color:#1e3a5f;color:var(--blue)}
+  .bbtn.gray{color:var(--dim)}
+  .bbtn:disabled{opacity:.45;cursor:default}
+  details{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+  summary{cursor:pointer;font-size:14px;color:var(--dim);font-weight:700;user-select:none;list-style:none;display:flex;align-items:center;gap:6px}
+  summary::-webkit-details-marker{display:none}
+  summary .arrow{transition:transform .2s;display:inline-block}
+  details[open] summary .arrow{transform:rotate(90deg)}
+  .det{margin-top:10px}
+  .detrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(42,51,69,.5);font-size:14px}
+  .detrow:last-child{border-bottom:none}
+  .detrow .k{color:var(--dim)}
+  .detrow .v{color:var(--txt);text-align:right;font-weight:600}
+  .detrow .v a{color:var(--blue);text-decoration:none}
+  .note{background:var(--card2);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:10px;white-space:pre-wrap;color:var(--txt)}
+  .note b{color:var(--accent)}
+  .log{margin-top:10px;font-size:13px;color:var(--dim)}
+  .log div{margin-bottom:4px}
   .log .d{color:var(--accent);font-weight:700;margin-right:6px}
-  details{margin-top:6px}
-  summary{cursor:pointer;font-size:12.5px;color:var(--dim);user-select:none}
-  .note{background:var(--card2);border-radius:8px;padding:8px;font-size:12.5px;margin-top:6px;white-space:pre-wrap;color:var(--txt)}
-  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-  .fchip{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer}
-  .fchip.on{background:var(--card2);color:var(--accent);border-color:var(--accent)}
-  .search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:9px 12px;font-size:14px;margin-bottom:10px}
-  .search::placeholder{color:var(--dim)}
-  .empty{color:var(--dim);font-size:13px;text-align:center;padding:24px 0}
-  .sec{margin-bottom:6px}
-  .task{display:flex;align-items:flex-start;gap:8px;padding:8px 4px;border-bottom:1px dashed var(--line);font-size:13.5px}
-  .task input{margin-top:3px;width:16px;height:16px;accent-color:var(--accent)}
+  .mini{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;font-size:14.5px}
+  .mini .mname{font-weight:700}
+  .mini .mcd{color:var(--dim);white-space:nowrap}
+  .mini .mcd.red{color:var(--red);font-weight:700}
+  .mini .mcd.amber{color:var(--amber);font-weight:700}
+  /* ---------- welcome ---------- */
+  .welcome{background:linear-gradient(135deg,#10301f 0%,#0e1b2c 60%,#171d28 100%);border:1px solid var(--accent);border-radius:18px;padding:20px;margin-bottom:16px}
+  .welcome h3{font-size:20px;margin-bottom:8px}
+  .welcome p{font-size:14.5px;color:var(--dim);margin-bottom:6px}
+  .welcome b{color:var(--txt)}
+  .welcome .okbtn{display:block;width:100%;margin-top:12px;background:var(--accent);color:#06281a;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer}
+  /* ---------- tasks ---------- */
+  .task{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .task input{margin-top:4px;width:18px;height:18px;accent-color:var(--accent)}
   .task.done{color:var(--dim);text-decoration:line-through}
-  .opp-tier{font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--dim);margin:16px 0 6px;text-transform:uppercase}
-  .opp{padding:10px 12px}
-  .opp .pay{color:var(--accent);font-weight:700}
-  .opp select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:5px 8px;font-size:12.5px}
-  .boxkit{font-size:12.5px;color:var(--dim);margin-top:4px}
-  .boxkit b{color:var(--txt)}
-  .kitlist{margin:4px 0 2px;padding-left:16px}
-  .kitlist li{font-size:12.5px;margin-bottom:2px}
-  .badge-OPEN{background:#0f2a21;color:var(--accent);font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px}
-  .badge-SEALED{background:#1e2a3a;color:var(--blue);font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px}
-  .badge-CLOSED{background:#2a1616;color:var(--red);font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px}
-  .badge-PAUSED{background:#232733;color:var(--dim);font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px}
-  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;overflow-y:auto;padding:20px 14px}
-  #modal.on{display:block}
-  .modal-box{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:600px;margin:20px auto;padding:16px}
-  .modal-box h3{margin-bottom:12px}
-  .field{margin-bottom:10px}
-  .field label{display:block;font-size:12px;color:var(--dim);margin-bottom:4px;font-weight:600}
-  .field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:9px 10px;font-size:14px;font-family:inherit}
-  .field textarea{min-height:60px;resize:vertical}
+  /* ---------- opportunities ---------- */
+  .opp{padding:14px 16px}
+  .opp .opname{font-weight:800;font-size:15.5px}
+  .opp .opay{color:var(--accent);font-size:13.5px;font-weight:700;margin-top:2px}
+  .opp select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 9px;font-size:13.5px}
+  .tier{font-size:12px;font-weight:800;letter-spacing:.8px;color:var(--dim);margin:18px 0 8px;text-transform:uppercase}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .fchip{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
+  .fchip.on{background:var(--card2);color:var(--accent);border-color:var(--accent)}
+  .search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:11px 14px;font-size:15px;margin-bottom:12px}
+  .search::placeholder{color:var(--dim)}
+  .empty{color:var(--dim);font-size:14px;text-align:center;padding:26px 8px}
+  /* ---------- drafts ---------- */
+  #d_text{width:100%;min-height:52vh;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:14px;font-size:16px;font-family:inherit;line-height:1.6;resize:vertical}
+  .inline-input{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:8px 10px;font-size:14.5px;max-width:100%}
+  /* ---------- settings ---------- */
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat .n{font-size:26px;font-weight:800;color:var(--accent)}
+  .stat .t{font-size:12.5px;color:var(--dim)}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px;font-weight:700}
+  .field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14.5px;font-family:inherit}
+  .field textarea{min-height:64px;resize:vertical}
   .field input[type=date]{color-scheme:dark}
-  .modal-actions{display:flex;gap:8px;margin-top:14px}
-  .hint{font-size:11.5px;color:var(--dim);margin-top:3px}
-  .footer{color:var(--dim);font-size:11.5px;text-align:center;padding:20px 0 30px}
-  .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--accent);color:var(--txt);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.5);transition:opacity .4s;max-width:90vw;text-align:center}
+  .hint{font-size:12.5px;color:var(--dim);margin-top:4px}
+  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;overflow-y:auto;padding:20px 14px}
+  #modal.on{display:block}
+  .modal-box{background:var(--card);border:1px solid var(--line);border-radius:18px;max-width:560px;margin:16px auto;padding:18px}
+  .modal-box h3{margin-bottom:14px;font-size:18px}
+  .modal-actions{display:flex;gap:10px;margin-top:16px}
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--accent);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:opacity .4s;max-width:90vw;text-align:center}
   .toast.out{opacity:0}
-  #d_text{width:100%;min-height:52vh;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:12px;font-size:15px;font-family:inherit;line-height:1.55;resize:vertical}
-  .inline-input{background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:6px 8px;font-size:13.5px;max-width:100%}
+  .footer{color:var(--dim);font-size:12px;text-align:center;padding:22px 0 30px}
 </style>
 </head>
 <body>
@@ -121,36 +142,35 @@
   <div id="stats"></div>
   <nav id="tabs">
     <button class="tabbtn on" data-tab="today">📌 Today</button>
-    <button class="tabbtn" data-tab="outlets">📤 Outlets</button>
-    <button class="tabbtn" data-tab="opps">🎯 Opportunities</button>
-    <button class="tabbtn" data-tab="boxes">📦 Boxes</button>
+    <button class="tabbtn" data-tab="outlets">📤 My Pitches</button>
     <button class="tabbtn" data-tab="drafts">📝 Drafts</button>
+    <button class="tabbtn" data-tab="opps">💡 Ideas</button>
     <button class="tabbtn" data-tab="settings">⚙️ Settings</button>
   </nav>
 </header>
 <main>
   <section id="tab-today" class="tab on"></section>
   <section id="tab-outlets" class="tab"></section>
-  <section id="tab-opps" class="tab"></section>
-  <section id="tab-boxes" class="tab"></section>
   <section id="tab-drafts" class="tab"></section>
+  <section id="tab-opps" class="tab"></section>
   <section id="tab-settings" class="tab"></section>
 </main>
 <div id="modal"></div>
-<div class="footer">PitchLedger v1.2 · Made for Sodiq's writing pipeline · data stays on this device · back up in Settings</div>
+<div class="footer">PitchLedger v2 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
 <script>
 "use strict";
-/* ================= STORAGE (safe fallback if localStorage blocked) ================= */
+/* ================= STORAGE ================= */
 var mem = {};
 function sget(k){ try{ return window.localStorage.getItem(k); }catch(e){ return mem[k]!==undefined?mem[k]:null; } }
 function sset(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){} mem[k]=v; }
 
-/* ================= STATUS META ================= */
+/* ================= STATUSES (plain words) ================= */
 var STATUS = ["PITCHED","NUDGED1","NUDGED2","YES","NO","CLOSED","PUBLISHED","PAID","PAUSED"];
-var ST_LABEL = {PITCHED:"Pitched",NUDGED1:"Nudged 1",NUDGED2:"Nudged 2",YES:"Yes",NO:"No",CLOSED:"Closed",PUBLISHED:"Published",PAID:"Paid",PAUSED:"Paused"};
+var ST_LABEL = {PITCHED:"Waiting",NUDGED1:"Reminder sent",NUDGED2:"2 reminders sent",YES:"Accepted! 🎉",NO:"No",CLOSED:"Closed",PUBLISHED:"Published 📄",PAID:"Paid 💰",PAUSED:"On hold"};
 var ACTIVE = ["PITCHED","NUDGED1","NUDGED2"];
+var BOX_LABEL = {OPEN:"Ready to write",SEALED:"Wait for their yes",PAUSED:"On hold",CLOSED:"Closed"};
 
-/* ================= SEED DATA ================= */
+/* ================= SEED ================= */
 function seed(){
   return {
     appName:"PitchLedger",
@@ -160,11 +180,11 @@ function seed(){
        claim:"AI is giving young Africans without traditional tech access a genuine path into software.",
        kit:"Door scenes: the decision to learn, first successful build, Fortebet Learning as proof, laughed-at → earned respect.",
        offLimits:"NumPy battle · power cuts · 'shortcuts' · the bridge · betting shop interior",
-       wordCount:"1,000–1,500",pay:"TBD",payMethod:"TBD",
-       notes:"Ann replied 4 Aug: 'very intrigued… would love to publish it in Afrolicious… restructuring… will reach back out in one month's time.' Nudge 4–7 Sep if silent. Draft to be ready by 1 Sep. DO NOT reuse phone-setup opening or Republic ending formula.",
+       wordCount:"1,000–1,500",pay:"TBD",payMethod:"",
+       notes:"Ann said YES (4 Aug): 'very intrigued… would love to publish it… restructuring… reach back out in one month.' Draft ready by 1 Sep. Don't reuse the phone-setup opening or Republic's ending.",
        publishedLink:"",
        log:[
-         {d:"2026-08-04",e:"Ann Daramola: very intrigued, would love to publish after restructuring; will follow up in ~1 month."},
+         {d:"2026-08-04",e:"Ann: very intrigued, wants to publish after restructuring, will follow up in ~1 month."},
          {d:"2026-08-07",e:"Replied 'Looking forward to it!'"}
        ]},
       {id:"row",name:"Rest of World",website:"https://restofworld.org",type:"Magazine",status:"PITCHED",box:"SEALED",
@@ -173,9 +193,8 @@ function seed(){
        kit:"NumPy install battle · power cuts · data costs · GitHub · the phone as a development machine.",
        offLimits:"'Access/opportunity' moralizing · AI education thesis · the bridge",
        wordCount:"800–1,000 (Ideas)",pay:"~$1/word",payMethod:"Bank",
-       notes:"Nudge at 3–4 weeks after pitch date. Machine, not door.",
-       publishedLink:"",
-       log:[]},
+       notes:"Reminder at 3–4 weeks after pitch date. The machine, not the door.",
+       publishedLink:"",log:[]},
       {id:"noema",name:"Noema",website:"https://noemamag.com",type:"Magazine",status:"PITCHED",box:"SEALED",
        pitchDate:"",nudgeDays:30,closeDays:60,editorName:"",editorEmail:"",
        claim:"AI is becoming educational infrastructure, compressing years of learning into months — not replacing effort, but changing how expertise is built.",
@@ -183,35 +202,31 @@ function seed(){
        offLimits:"Nigerian phone-coding texture · personal route into software · 'shortcuts'",
        wordCount:"essay",pay:"~$3,000",payMethod:"Bank",
        notes:"Replies within ~1 month if accepted. If silent past 6 weeks → re-tool for Aeon.",
-       publishedLink:"",
-       log:[]},
+       publishedLink:"",log:[]},
       {id:"republic",name:"The Republic",website:"https://republic.com.ng",type:"Journal",status:"PITCHED",box:"SEALED",
        pitchDate:"",nudgeDays:21,closeDays:42,editorName:"",editorEmail:"editors@republic.com.ng",
        claim:"AI is changing what ambition looks like for young Nigerians.",
-       kit:"Nigerian context · youth · coding culture · self-learning · REPORTING SPINE needed (interviews, Lagos fieldwork).",
+       kit:"Nigerian context · youth · coding culture · self-learning · REPORTING needed (interviews, Lagos fieldwork).",
        offLimits:"'AI + effort = opportunity' ending (Afrolicious owns access) · infrastructure thesis",
        wordCount:"1,500–3,500",pay:"₦200,000–₦500,000",payMethod:"Bank (naira)",
        notes:"Quarterly themed issues — verify current call. Needs reporting, not just memoir.",
-       publishedLink:"",
-       log:[]},
+       publishedLink:"",log:[]},
       {id:"incomedaily",name:"Income Daily",website:"",type:"Newsletter",status:"PITCHED",box:"SEALED",
        pitchDate:"",nudgeDays:14,closeDays:28,editorName:"",editorEmail:"",
        claim:"The internet sold me wealth; programming taught me value.",
        kit:"Trading bots · online schemes · skill-building · work vs hype · becoming a center manager.",
        offLimits:"The word 'shortcuts' (Byline owns it) · gambling addiction psychology",
        wordCount:"",pay:"TBD",payMethod:"",
-       notes:"Fast-turnaround outlet. Nudge at 2 weeks. Re-end on value/work, not 'shortcuts'.",
-       publishedLink:"",
-       log:[]},
+       notes:"Fast outlet. Reminder at 2 weeks. End on value/work, not 'shortcuts'.",
+       publishedLink:"",log:[]},
       {id:"byline",name:"Byline",website:"",type:"Platform",status:"PAUSED",box:"PAUSED",
        pitchDate:"",nudgeDays:14,closeDays:28,editorName:"",editorEmail:"",
        claim:"The real addiction wasn't gambling — it was shortcuts.",
        kit:"Sleeping under the bridge (opening) · ₦98k win · ₦500k loss · recovery through programming.",
        offLimits:"Betting shop interior · family break (Vox) · access/opportunity (Afrolicious)",
        wordCount:"",pay:"",payMethod:"",
-       notes:"PAUSED by choice — Afrolicious is priority. Kit reserved; can be opened any time.",
-       publishedLink:"",
-       log:[]},
+       notes:"PAUSED by choice — Afrolicious is priority. Material reserved; can be opened any time.",
+       publishedLink:"",log:[]},
       {id:"vox",name:"Vox (First Person)",website:"https://vox.com",type:"Magazine",status:"PITCHED",box:"SEALED",
        pitchDate:"",nudgeDays:21,closeDays:42,editorName:"",editorEmail:"",
        claim:"Gambling addiction isn't just about money — it changes how you think and how hard it is to rebuild.",
@@ -219,25 +234,24 @@ function seed(){
        offLimits:"The bridge scene · 'shortcuts' thesis · ₦98k/₦500k numbers (Byline)",
        wordCount:"800–1,500",pay:"$400–500",payMethod:"Bank",
        notes:"Needs a 'why now' hook. Vox may ask for a full draft within days.",
-       publishedLink:"",
-       log:[]}
+       publishedLink:"",log:[]}
     ],
     opps:[
-      {id:"medium",name:"Medium Partner Program",tier:1,pay:"Yes — member read earnings (Nigeria eligible since Aug 2024)",how:"Join MPP, publish 1 story, link Stripe for payout",link:"https://medium.com",status:"not-started",notes:"Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."},
-      {id:"devto",name:"DEV.to",tier:1,pay:"No — exposure/portfolio",how:"Free account, instant publish",link:"https://dev.to",status:"not-started",notes:"freeCodeCamp literally recommends new writers start here for samples."},
-      {id:"hackernoon",name:"HackerNoon",tier:1,pay:"Contests up to $2,000 (USDT/crypto)",how:"Submit story, editor review, enter contests",link:"https://hackernoon.com",status:"not-started",notes:"Crypto-friendly payments work from Nigeria."},
-      {id:"techcabal",name:"TechCabal",tier:2,pay:"$175 / 1,000–1,200 words",how:"300–400-word pitch → kay@bigcabal.com (subject = working headline)",link:"https://techcabal.com/come-write-for-us/",status:"not-started",notes:"Needs 2–3 samples — get them from Medium/DEV first."},
-      {id:"zikoko",name:"Zikoko (Big Cabal)",tier:2,pay:"Pays contributors (amount at acceptance)",how:"Pitch via submission form; ruth@bigcabal.com",link:"https://www.zikoko.com/announcements/how-to-write-for-zikoko-a-contributor-guide/",status:"not-started",notes:"Open call for Nigerian creators worldwide. Gambling/recovery + hustle culture fit here."},
-      {id:"continent",name:"The Continent",tier:2,pay:"Pays journalists",how:"Pitch stories from where you live",link:"https://thecontinent.org",status:"not-started",notes:"Pan-African weekly, built on local freelancers."},
-      {id:"elephant",name:"The Elephant",tier:2,pay:"Pays after publication (first 10 days of next month)",how:"Pitch → info@theelephant.info",link:"https://www.theelephant.info/write-for-us/",status:"not-started",notes:"Small budget but real payment + editorial support."},
-      {id:"africanargs",name:"African Arguments",tier:2,pay:"Pays African journalists on the continent; fellowship ~$250/article + mentoring",how:"Submit via write-for-us page; fellowship application",link:"https://africanarguments.org/write-for-us/",status:"not-started",notes:"PRIORITISES African writers based in Africa. Apply to the fellowship."},
-      {id:"techpoint",name:"Techpoint Africa",tier:2,pay:"No pay mentioned — exposure",how:"Full submission ~1,000 words → editor@techpoint.africa, subject 'Guest Contributor'",link:"https://techpoint.africa/pitch-us/",status:"not-started",notes:"⚠️ Rejects AI-GENERATED content. 30-day exclusivity. High traffic."},
-      {id:"fcc",name:"freeCodeCamp News",tier:2,pay:"No pay — massive audience + editorial support",how:"Apply via form in style guide (needs 3 article samples)",link:"https://www.freecodecamp.org/news/how-to-write-for-freecodecamp/",status:"not-started",notes:"Build 3 samples on DEV.to/Hashnode first. Approves small % — retry."},
-      {id:"uniteai",name:"Unite.AI",tier:2,pay:"No pay — author bio link",how:"Word doc per Thought Leaders guidelines (1,000+ words, 5+ source links)",link:"https://www.unite.ai/guidelines/",status:"not-started",notes:"⚠️ No AI-generated text. You qualify as someone 'directly involved in AI'."},
-      {id:"nigeriajournal",name:"Nigeria Journal",tier:2,pay:"No pay mentioned",how:"Email pitch/article → tech4english@gmail.com, subject 'Submission – [Title]'",link:"https://nigeriajournal.com/write-for-us/",status:"not-started",notes:"800–1,200 words, replies ~2 weeks, welcomes emerging writers."},
-      {id:"aeon",name:"Aeon",tier:3,pay:"Pays essay rates (verify current)",how:"Pitch after you have clips",link:"https://aeon.co",status:"watchlist",notes:"Noema backup: re-tool the infrastructure thesis, global scope."},
-      {id:"huffpost",name:"HuffPost Personal",tier:3,pay:"~$100+",how:"Submit essay after clips",link:"https://www.huffpost.com",status:"watchlist",notes:"Vox backup for the gambling-rebuild essay."},
-      {id:"catapult",name:"Catapult",tier:3,pay:"Pays",how:"Pitch after clips",link:"https://catapult.co",status:"watchlist",notes:"Second home for the gambling-damage essay."}
+      {id:"medium",name:"Medium (Partner Program)",tier:1,pay:"Yes — earns from member reads (Nigeria eligible)",how:"Join MPP, publish 1 story, link Stripe",link:"https://medium.com",status:"not-started",notes:"Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."},
+      {id:"devto",name:"DEV.to",tier:1,pay:"No — exposure/portfolio",how:"Free account, instant publish",link:"https://dev.to",status:"not-started",notes:"freeCodeCamp recommends new writers start here for samples."},
+      {id:"hackernoon",name:"HackerNoon",tier:1,pay:"Contests up to $2,000 (USDT)",how:"Submit story, editor review, contests",link:"https://hackernoon.com",status:"not-started",notes:"Crypto-friendly payments work from Nigeria."},
+      {id:"techcabal",name:"TechCabal",tier:2,pay:"$175 / 1,000–1,200 words",how:"300–400-word pitch → kay@bigcabal.com",link:"https://techcabal.com/come-write-for-us/",status:"not-started",notes:"Needs 2–3 samples — get them from Medium/DEV first."},
+      {id:"zikoko",name:"Zikoko (Big Cabal)",tier:2,pay:"Pays contributors (amount at acceptance)",how:"Pitch via submission form; ruth@bigcabal.com",link:"https://www.zikoko.com/announcements/how-to-write-for-zikoko-a-contributor-guide/",status:"not-started",notes:"Open call for Nigerian creators worldwide. Gambling/recovery + hustle culture fit."},
+      {id:"africanargs",name:"African Arguments",tier:2,pay:"Pays African journalists; fellowship ~$250/article",how:"Submit via write-for-us page; fellowship application",link:"https://africanarguments.org/write-for-us/",status:"not-started",notes:"PRIORITISES African writers based in Africa. Apply to the fellowship."},
+      {id:"techpoint",name:"Techpoint Africa",tier:2,pay:"No pay mentioned — exposure",how:"Full submission ~1,000 words → editor@techpoint.africa",link:"https://techpoint.africa/pitch-us/",status:"not-started",notes:"⚠️ Rejects AI-GENERATED content. 30-day exclusivity."},
+      {id:"fcc",name:"freeCodeCamp News",tier:2,pay:"No pay — huge audience + editing help",how:"Apply via style-guide form (needs 3 samples)",link:"https://www.freecodecamp.org/news/how-to-write-for-freecodecamp/",status:"not-started",notes:"Build 3 samples on DEV.to first. Small approval % — retry."},
+      {id:"omenana",name:"Omenana (African spec-fic)",tier:2,pay:"$20/story",how:"Submit in open windows (check omenana.com)",link:"https://omenana.com/omenana-submissions/",status:"not-started",notes:"Wants African speculative fiction — your fantasy edge."},
+      {id:"fiyah",name:"FIYAH (Black spec-fic)",tier:2,pay:"8¢/word",how:"Submit in themed windows",link:"https://fiyahlitmag.com",status:"not-started",notes:"Black speculative fiction by Black writers — you qualify."},
+      {id:"simfiction",name:"SimFiction Review",tier:2,pay:"10¢/word up to $250 (first-timers)",how:"Online portal, .RTF/.DOCX, disclose AI in cover letter",link:"https://simfictionreview.com/submissions/",status:"not-started",notes:"Actively welcomes AI use + first-time authors. Tech/AI/simulation themes."},
+      {id:"kdp",name:"Amazon KDP (self-publish)",tier:2,pay:"70% royalties",how:"Upload book; AI-generated needs private disclosure",link:"https://kdp.amazon.com",status:"not-started",notes:"Fantasy sells best. Payoneer → naira."},
+      {id:"okadabooks",name:"OkadaBooks (Nigerian)",tier:2,pay:"70% royalties, naira bank transfer",how:"Upload your book, sell to Nigerian readers",link:"https://okadabooks.com",status:"not-started",notes:"Readers pay via airtime. Instant Nigerian presence."},
+      {id:"clarkesworld",name:"Clarkesworld",tier:3,pay:"14¢/word",how:"Online tracker only; no simultaneous subs; no AI",link:"https://clarkesworldmagazine.com/submissions/",status:"watchlist",notes:"~1% acceptance. Read 10 stories first. Nigerian voices winning."},
+      {id:"commonwealth",name:"Commonwealth Short Story Prize",tier:3,pay:"£5,000 overall / £2,500 regional",how:"Free entry ~1 Nov; 2,000–5,000 words; fantasy OK",link:"https://commonwealthfoundation.com",status:"watchlist",notes:"Nigeria eligible. Winners published in Granta."}
     ],
     boxes:[
       {id:"afrolicious",name:"Afrolicious",status:"OPEN",claim:"AI gives young Africans without traditional tech access a genuine path into software.",kit:["The decision to learn — the trigger","The phone as the only tool (backdrop only)","First successful build — the proof","Laughed at → earned respect","Fortebet Learning as the CLIMAX"],offLimits:["NumPy battle / power cuts / data costs","The word 'shortcuts'","The bridge, ₦98k, ₦500k","'AI won't replace ambition' ending","Infrastructure/compression thesis"]},
@@ -249,17 +263,16 @@ function seed(){
       {id:"vox",name:"Vox First Person",status:"SEALED",claim:"Gambling addiction isn't just about money — it changes how you think and how hard rebuilding is.",kit:["Betting shop interior","The family break","Cognitive damage — how gambling rewires thinking","Rebuild as a social story","Fortebet job setting"],offLimits:["The bridge scene","The 'shortcuts' thesis","₦98k / ₦500k numbers"]}
     ],
     tasks:[
-      {t:"Publish 1–2 pieces on Medium (Partner Program) — first clip THIS WEEK",done:false},
-      {t:"Cross-post to DEV.to + LinkedIn (builds freeCodeCamp samples)",done:false},
-      {t:"Pitch TechCabal ($175) + Zikoko (pays) — tailored, no copy-paste",done:false},
-      {t:"Apply: African Arguments fellowship (~$250/article + mentoring)",done:false},
-      {t:"Afrolicious draft ready by 1 Sep (door scenes, no borrowed material)",done:false},
-      {t:"Nudge Afrolicious 4–7 Sep if silent",done:false},
-      {t:"2 new pitches every 2 weeks — next batch due ~21 Aug",done:false},
-      {t:"Deploy PitchLedger to GitHub Pages (free hosting)",done:false}
+      {t:"Publish 1–2 pieces on Medium — first clip THIS WEEK",done:false},
+      {t:"Afrolicious draft ready by 1 Sep (door scenes only)",done:false},
+      {t:"Send Afrolicious a reminder 4–7 Sep if she's silent",done:false},
+      {t:"Pitch TechCabal ($175) + Zikoko (pays)",done:false},
+      {t:"Apply: African Arguments fellowship (~$250/article)",done:false},
+      {t:"2 new pitches every 2 weeks — next batch ~21 Aug",done:false},
+      {t:"Deploy PitchLedger to GitHub Pages",done:false}
     ],
     drafts:[
-      {id:"d-afrolicious",title:"Afrolicious — essay outline (OPEN box)",outlet:"Afrolicious",updated:"2026-08-07",text:"CLAIM: AI is giving young Africans without traditional tech access a genuine path into software.\n\nKIT (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nOFF-LIMITS (belongs to other boxes):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING options (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING (locked direction): access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not on a slogan.\n\nWord count target: 1,000–1,500 · Draft ready by 1 Sep · Paste your draft here and let it auto-save."}
+      {id:"d-afrolicious",title:"Afrolicious — essay outline (ready to write)",outlet:"Afrolicious",updated:"2026-08-07",text:"THE IDEA: AI is giving young Africans without traditional tech access a genuine path into software.\n\nYOUR MATERIAL (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nDON'T USE (belongs to other stories):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING ideas (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING: access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not a slogan.\n\nLength: 1,000–1,500 words. Paste your draft here and it saves itself."}
     ]
   };
 }
@@ -268,17 +281,13 @@ function seed(){
 var state;
 function load(){
   var raw = sget("pitchledger_v1");
-  if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets) return s; }catch(e){} }
+  if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets){ if(!s.drafts) s.drafts=[]; return s; } }catch(e){} }
   var s = seed(); save(s); return s;
 }
 function save(s){ sset("pitchledger_v1", JSON.stringify(s)); }
 
 /* ================= DATE HELPERS ================= */
-function parseISO(iso){
-  if(!iso) return null;
-  var p = iso.split("-"); if(p.length<3) return null;
-  return new Date(+p[0], +p[1]-1, +p[2]);
-}
+function parseISO(iso){ if(!iso) return null; var p=iso.split("-"); if(p.length<3) return null; return new Date(+p[0],+p[1]-1,+p[2]); }
 function toISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function addDays(iso,n){ var d=parseISO(iso); if(!d) return null; d.setDate(d.getDate()+n); return toISO(d); }
 function daysUntil(iso){ var d=parseISO(iso); if(!d) return null; var t=parseISO(toISO(new Date())); return Math.round((d-t)/86400000); }
@@ -288,211 +297,168 @@ function wordCount(s){ s=(s||"").trim(); return s ? s.split(/\s+/).length : 0; }
 function toast(msg){
   var d=document.createElement("div"); d.className="toast"; d.textContent=msg;
   document.body.appendChild(d);
-  setTimeout(function(){ d.classList.add("out"); setTimeout(function(){ d.remove(); },450); },2000);
+  setTimeout(function(){ d.classList.add("out"); setTimeout(function(){ d.remove(); },450); },2200);
 }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
+/* ================= STATUS INFO (plain words) ================= */
 function nudgeDate(o){ return o.pitchDate?addDays(o.pitchDate,o.nudgeDays):null; }
 function closeDate(o){ return o.pitchDate?addDays(o.pitchDate,o.closeDays):null; }
 
-/* ================= URGENCY ================= */
 function urgency(o){
   if(!ACTIVE.includes(o.status)) return null;
-  if(!o.pitchDate) return {level:"none",label:"Set pitch date",days:null};
+  if(!o.pitchDate) return {level:"none",label:"Add the date you pitched",days:null};
   if(o.status==="NUDGED2"){
     var cd=closeDate(o), d=daysUntil(cd);
-    if(d<0) return {level:"red",label:"Overdue — close thread or decide",days:d};
-    if(d<=7) return {level:"amber",label:"Close decision due in "+d+"d",days:d};
-    return {level:"ok",label:"Close decision in "+d+"d",days:d};
+    if(d<0) return {level:"red",label:"Time to close this or decide",days:d};
+    if(d<=7) return {level:"amber",label:"Decide in "+d+" day"+(d===1?"":"s"),days:d};
+    return {level:"ok",label:"Decide in "+d+" day"+(d===1?"":"s"),days:d};
   }
   var nd=nudgeDate(o), d=daysUntil(nd);
-  if(d<0) return {level:"red",label:"OVERDUE — nudge now ("+(-d)+"d late)",days:d};
-  if(d===0) return {level:"red",label:"Nudge due TODAY",days:0};
-  if(d<=7) return {level:"amber",label:"Nudge in "+d+"d",days:d};
-  return {level:"ok",label:"Nudge in "+d+"d",days:d};
+  if(d<0) return {level:"red",label:"Send the reminder now",days:d};
+  if(d===0) return {level:"red",label:"Send the reminder today",days:0};
+  if(d<=7) return {level:"amber",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
+  return {level:"ok",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
 }
 function cardClass(o){
   var u=urgency(o);
-  if(u && u.level==="red") return "redbar";
-  if(u && u.level==="amber") return "amberbar";
+  if(u&&u.level==="red") return "redbar";
+  if(u&&u.level==="amber") return "amberbar";
   if(o.status==="YES") return "greenbar";
-  if(o.status==="PITCHED"||o.status==="NUDGED1"||o.status==="NUDGED2") return "bluebar";
+  if(ACTIVE.includes(o.status)) return "bluebar";
   return "graybar";
+}
+/* Friendly main line for a card */
+function countdownHTML(o){
+  var u=urgency(o);
+  if(o.status==="YES"){
+    return '<div class="cd"><span class="num green">Accepted! 🎉</span><span class="lbl">Write the piece now — draft ready by 1 Sep</span>'+(nudgeDate(o)?'<span class="sub">If silent, gentle reminder '+fmt(nudgeDate(o))+'</span>':'')+'</div>';
+  }
+  if(o.status==="PAUSED") return '<div class="cd"><span class="num dim">On hold</span><span class="lbl">Material is reserved. Open it anytime.</span></div>';
+  if(o.status==="NO"||o.status==="CLOSED") return '<div class="cd"><span class="num red">Closed</span><span class="lbl">This one is done. Material can be reused elsewhere.</span></div>';
+  if(o.status==="PUBLISHED") return '<div class="cd"><span class="num dim">Published 📄</span><span class="lbl">Congrats! Mark paid when the money lands.</span></div>';
+  if(o.status==="PAID") return '<div class="cd"><span class="num green">Paid 💰</span><span class="lbl">Nice. On to the next pitch.</span></div>';
+  if(u&&u.level==="red") return '<div class="cd"><span class="num red">'+(u.days>0?"+"+u.days:u.days)+'</span><span class="lbl">'+esc(u.label)+'</span>'+(nudgeDate(o)?'<span class="sub">was due '+fmt(nudgeDate(o))+'</span>':'')+'</div>';
+  if(u&&u.level==="amber") return '<div class="cd"><span class="num amber">'+u.days+'</span><span class="lbl">'+esc(u.label)+'</span><span class="sub">on '+fmt(nudgeDate(o))+'</span></div>';
+  if(u&&u.level==="ok") return '<div class="cd"><span class="num green">'+u.days+'</span><span class="lbl">'+esc(u.label)+'</span><span class="sub">on '+fmt(nudgeDate(o))+'</span></div>';
+  return '<div class="cd"><span class="num dim">—</span><span class="lbl">Add the date you pitched, and the countdown starts.</span></div>';
+}
+function actionButtons(o){
+  var b="";
+  if(o.status==="PITCHED"||o.status==="NUDGED1"){
+    b+='<button class="bbtn amber" data-act="mark" data-id="'+o.id+'" data-to="'+(o.status==="PITCHED"?"NUDGED1":"NUDGED2")+'">💬 Reminder sent</button>';
+    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="YES">🎉 They said yes</button>';
+    b+='<button class="bbtn red" data-act="mark" data-id="'+o.id+'" data-to="NO">No reply — close it</button>';
+  } else if(o.status==="NUDGED2"){
+    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="YES">🎉 They said yes</button>';
+    b+='<button class="bbtn red" data-act="mark" data-id="'+o.id+'" data-to="CLOSED">Close it</button>';
+  } else if(o.status==="YES"){
+    b+='<button class="bbtn blue" data-act="mark" data-id="'+o.id+'" data-to="PUBLISHED">📄 I published it</button>';
+  } else if(o.status==="PUBLISHED"){
+    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="PAID">💰 I got paid</button>';
+  } else if(o.status==="PAUSED"||o.status==="NO"||o.status==="CLOSED"){
+    b+='<button class="bbtn blue" data-act="mark" data-id="'+o.id+'" data-to="PITCHED">↩️ Reopen</button>';
+  }
+  return b;
 }
 
 /* ================= RENDER: STATS ================= */
 function renderStats(){
-  var els=document.getElementById("stats");
-  var active=state.outlets.filter(o=>ACTIVE.includes(o.status)).length;
-  var yes=state.outlets.filter(o=>o.status==="YES").length;
-  var pub=state.outlets.filter(o=>["PUBLISHED","PAID"].includes(o.status)).length;
-  var overdue=state.outlets.filter(o=>{var u=urgency(o);return u&&u.level==="red";}).length;
-  var html='<span class="chip">📤 Active <b>'+active+'</b></span>'+
-           '<span class="chip">✅ Yes <b>'+yes+'</b></span>'+
-           '<span class="chip">📄 Published <b>'+pub+'</b></span>'+
-           (overdue?'<span class="chip" style="border-color:var(--red);color:var(--red)">⚠ Overdue <b>'+overdue+'</b></span>':'');
-  els.innerHTML=html;
+  var el=document.getElementById("stats");
+  var active=state.outlets.filter(function(o){return ACTIVE.includes(o.status);}).length;
+  var yes=state.outlets.filter(function(o){return o.status==="YES";}).length;
+  var pub=state.outlets.filter(function(o){return ["PUBLISHED","PAID"].includes(o.status);}).length;
+  var overdue=state.outlets.filter(function(o){var u=urgency(o);return u&&u.level==="red";}).length;
+  var h='<span class="chip">📤 Waiting <b>'+active+'</b></span><span class="chip">🎉 Accepted <b>'+yes+'</b></span><span class="chip">📄 Published <b>'+pub+'</b></span>';
+  if(overdue) h+='<span class="chip warn">🔔 Needs you now <b>'+overdue+'</b></span>';
+  el.innerHTML=h;
 }
 
 /* ================= RENDER: TODAY ================= */
 function renderToday(){
   var el=document.getElementById("tab-today");
-  var act=state.outlets.filter(o=>ACTIVE.includes(o.status));
-  var overdue=act.filter(o=>{var u=urgency(o);return u&&u.level==="red";}).sort((a,b)=>(urgency(a).days||0)-(urgency(b).days||0));
-  var soon=act.filter(o=>{var u=urgency(o);return u&&u.level==="amber";}).sort((a,b)=>(urgency(a).days||0)-(urgency(b).days||0));
-  var waiting=act.filter(o=>{var u=urgency(o);return !u||u.level==="ok";}).sort((a,b)=>(urgency(a)&&urgency(a).days||999)-(urgency(b)&&urgency(b).days||999));
-  var yesBut=state.outlets.filter(o=>o.status==="YES"&&!o.publishedLink);
-
-  var h='';
-  h+='<h2>⚠ Need action <span class="count">'+(overdue.length+soon.length+yesBut.length)+'</span></h2>';
-  if(!overdue.length&&!soon.length&&!yesBut.length) h+='<div class="empty">Nothing urgent. Nice. — but check the standing orders below.</div>';
-  overdue.forEach(o=>{ h+=outletCard(o); });
-  soon.forEach(o=>{ h+=outletCard(o); });
-  yesBut.forEach(o=>{
-    h+='<div class="card greenbar"><div class="cardrow"><div><div class="cardtitle">'+esc(o.name)+'</div><div class="countdown" style="color:var(--accent)">✅ YES — next step: send the draft / confirm the brief</div></div><span class="st st-YES">YES</span></div><div class="btns"><button class="btn amber" data-act="mark" data-id="'+o.id+'" data-to="PUBLISHED">📄 Mark published</button><button class="btn blue" data-act="edit" data-id="'+o.id+'">✏️ Edit</button></div></div>';
+  var act=state.outlets.filter(function(o){return ACTIVE.includes(o.status);});
+  var need=act.filter(function(o){var u=urgency(o);return u&&(u.level==="red"||u.level==="amber");}).sort(function(a,b){return (urgency(a).days||0)-(urgency(b).days||0);});
+  var yesBut=state.outlets.filter(function(o){return o.status==="YES";});
+  var waiting=act.filter(function(o){var u=urgency(o);return !u||u.level==="ok";}).sort(function(a,b){return (urgency(a)&&urgency(a).days||999)-(urgency(b)&&urgency(b).days||999);});
+  var h="";
+  if(!sget("welcomeSeen")){
+    h+='<div class="welcome"><h3>Welcome, Sodiq 👋</h3><p><b>This app tracks your writing pitches.</b> Three things to know:</p><p>1️⃣ <b>My Pitches</b> — every place you sent a story, with a live countdown telling you <b>when to send a reminder</b>.</p><p>2️⃣ <b>Drafts</b> — paste any essay or draft here; it saves itself as you type.</p><p>3️⃣ <b>Ideas</b> — new places to pitch, with how much they pay.</p><p>Tap a pitch → <b>"Details"</b> to see dates, the editor, and your story material. Nothing is complicated — if something confuses you, ask me and I will fix it.</p><button class="okbtn" data-act="welcomedone">Got it — let\'s go 💪</button></div>';
+  }
+  h+='<h2>🔔 Needs you now <span class="count">'+(need.length+yesBut.length)+'</span></h2>';
+  if(!need.length&&!yesBut.length) h+='<div class="empty">Nothing urgent. Relax — check your to-do list below.</div>';
+  need.forEach(function(o){ h+=outletCard(o); });
+  yesBut.forEach(function(o){ h+=outletCard(o); });
+  h+='<h2>📝 Your to-do list</h2>';
+  h+='<div class="card">';
+  state.tasks.forEach(function(t,i){
+    h+='<div class="task'+(t.done?" done":"")+'"><input type="checkbox" data-task="'+i+'" '+(t.done?"checked":"")+'><div>'+esc(t.t)+'</div></div>';
   });
-  h+='<h2>🔔 Next 7 days</h2>';
-  if(!soon.length) h+='<div class="empty">No nudges due in the next 7 days.</div>';
-  soon.forEach(o=>{ h+=outletCard(o); });
-  h+='<h2>📌 Standing orders</h2>';
-  h+=renderTasks();
+  h+='<div style="display:flex;gap:8px;margin-top:10px"><input class="search" id="newTask" style="margin:0" placeholder="Add a task…"><button class="bbtn green" style="flex:0 0 auto;padding:11px 14px" data-act="addtask">Add</button></div>';
+  h+='</div>';
   h+='<h2>⏳ Waiting quietly <span class="count">'+waiting.length+'</span></h2>';
-  if(!waiting.length) h+='<div class="empty">No active pitches waiting.</div>';
-  waiting.forEach(o=>{ h+=outletCard(o); });
+  if(!waiting.length) h+='<div class="empty">Nothing waiting right now.</div>';
+  waiting.forEach(function(o){
+    var u=urgency(o);
+    var cd=u&&u.days!==null?'<span class="mcd '+(u.level||"")+'">reminder in '+u.days+'d</span>':'<span class="mcd">add pitch date</span>';
+    h+='<div class="mini"><span class="mname">'+esc(o.name)+'</span>'+cd+'</div>';
+  });
   el.innerHTML=h;
 }
 
-function renderTasks(){
-  var h='<div class="card">';
-  state.tasks.forEach((t,i)=>{
-    h+='<div class="task'+(t.done?" done":"")+'"><input type="checkbox" data-task="'+i+'" '+(t.done?"checked":"")+'><div>'+esc(t.t)+'</div></div>';
-  });
-  h+='<div style="display:flex;gap:6px;margin-top:10px"><input class="search" id="newTask" style="margin:0" placeholder="Add a task…"><button class="btn green" data-act="addtask">Add</button></div></div>';
-  return h;
-}
-
-/* ================= RENDER: OUTLETS ================= */
+/* ================= RENDER: MY PITCHES ================= */
 var filter="ALL", query="";
 function renderOutlets(){
   var el=document.getElementById("tab-outlets");
   var list=state.outlets.slice();
-  if(filter!=="ALL") list=list.filter(o=>o.status===filter);
-  if(query) list=list.filter(o=>(o.name+" "+o.claim+" "+(o.editorName||"")).toLowerCase().includes(query.toLowerCase()));
-  list.sort((a,b)=>{
+  if(filter!=="ALL") list=list.filter(function(o){return o.status===filter;});
+  if(query) list=list.filter(function(o){return (o.name+" "+o.claim+" "+(o.editorName||"")).toLowerCase().indexOf(query.toLowerCase())>-1;});
+  list.sort(function(a,b){
     var ua=urgency(a),ub=urgency(b);
-    var ra=(ua?((ua.days===null?999:ua.days)):998), rb=(ub?((ub.days===null?999:ub.days)):998);
+    var ra=(ua?(ua.days===null?999:ua.days):998), rb=(ub?(ub.days===null?999:ub.days):998);
     return ra-rb;
   });
-  var h='<div class="filters">';
-  ["ALL","PITCHED","NUDGED1","NUDGED2","YES","NO","PUBLISHED","PAID","PAUSED"].forEach(f=>{
-    var n=f==="ALL"?state.outlets.length:state.outlets.filter(o=>o.status===f).length;
-    h+='<button class="fchip'+(filter===f?" on":"")+'" data-filter="'+f+'">'+ST_LABEL[f]||f+' ('+n+')</button>';
+  var h='<h2>📤 My Pitches <span class="count">'+state.outlets.length+'</span></h2>';
+  h+='<div class="note" style="margin-bottom:12px"><b>How it works:</b> the number is <b>days until you send a reminder</b> (a polite "any news?" email). After 2 reminders with no answer, close it and move on. Tap a pitch → <b>Details</b> to see everything.</div>';
+  h+='<button class="bbtn green" data-act="newoutlet" style="width:100%;margin-bottom:14px">＋ Add a new pitch</button>';
+  h+='<div class="filters">';
+  ["ALL","PITCHED","NUDGED1","NUDGED2","YES","NO","PUBLISHED","PAID","PAUSED"].forEach(function(f){
+    var n=f==="ALL"?state.outlets.length:state.outlets.filter(function(o){return o.status===f;}).length;
+    h+='<button class="fchip'+(filter===f?" on":"")+'" data-filter="'+f+'">'+ST_LABEL[f]+' ('+n+')</button>';
   });
-  h+='</div><input class="search" id="outletSearch" placeholder="🔍 Search name, claim, editor…" value="'+esc(query)+'">';
-  h+='<button class="btn green" data-act="newoutlet" style="width:100%;margin-bottom:10px;padding:11px">＋ Add outlet</button>';
-  if(!list.length) h+='<div class="empty">Nothing here. Add an outlet or change the filter.</div>';
-  list.forEach(o=>{ h+=outletCard(o); });
+  h+='</div><input class="search" id="outletSearch" placeholder="🔍 Search…" value="'+esc(query)+'">';
+  if(!list.length) h+='<div class="empty">Nothing here. Add a pitch or change the filter.</div>';
+  list.forEach(function(o){ h+=outletCard(o); });
   el.innerHTML=h;
 }
 
 function outletCard(o){
-  var u=urgency(o);
-  var cd="";
-  if(o.status==="YES") cd='<div class="countdown" style="color:var(--accent)">✅ Yes — <b>'+fmt(nudgeDate(o)||(o.pitchDate?addDays(o.pitchDate,31):""))+'</b> follow-up if silent · draft ready: 1 Sep</div>';
-  else if(u && u.level==="red") cd='<div class="countdown"><span class="big red">'+(u.days>0?"+"+u.days:u.days)+'</span><span class="cd-label">'+esc(u.label)+'</span></div>';
-  else if(u && u.level==="amber") cd='<div class="countdown"><span class="big amber">'+u.days+'</span><span class="cd-label">days until nudge — '+fmt(nudgeDate(o))+'</span></div>';
-  else if(u && u.level==="ok") cd='<div class="countdown"><span class="big green">'+u.days+'</span><span class="cd-label">days until nudge — '+fmt(nudgeDate(o))+'</span></div>';
-  else if(u && u.level==="none") cd='<div class="countdown"><span class="big dim">—</span><span class="cd-label">set the pitch date to start the countdown</span></div>';
-  else if(o.status==="PAUSED") cd='<div class="countdown" style="color:var(--dim)">⏸ Paused — kit reserved</div>';
-  else if(o.status==="NO"||o.status==="CLOSED") cd='<div class="countdown" style="color:var(--red)">✗ Closed</div>';
-  else if(o.status==="PUBLISHED") cd='<div class="countdown" style="color:var(--purple)">📄 Published</div>';
-  else if(o.status==="PAID") cd='<div class="countdown" style="color:var(--accent)">💰 Paid</div>';
-
-  var web=o.website?'<a href="'+esc(o.website)+'" target="_blank" rel="noopener">'+esc(o.website.replace(/^https?:\/\//,""))+' ↗</a>':"";
-  var d1='Pitched: <b>'+(o.pitchDate?fmt(o.pitchDate):"<span style='color:var(--amber)'>not set</span>")+'</b>';
-  var d2='Nudge: <b>'+fmt(nudgeDate(o))+'</b>';
-  var d3='Close: <b>'+fmt(closeDate(o))+'</b>';
-
-  var btns="";
-  if(o.status==="PITCHED"||o.status==="NUDGED1"){
-    btns+='<button class="btn amber" data-act="mark" data-id="'+o.id+'" data-to="'+(o.status==="PITCHED"?"NUDGED1":"NUDGED2")+'">🔔 Nudge sent</button>';
-    btns+='<button class="btn green" data-act="mark" data-id="'+o.id+'" data-to="YES">✅ Yes</button>';
-    btns+='<button class="btn red" data-act="mark" data-id="'+o.id+'" data-to="NO">✗ No</button>';
-    btns+='<button class="btn dim" data-act="mark" data-id="'+o.id+'" data-to="PAUSED">⏸</button>';
-  } else if(o.status==="NUDGED2"){
-    btns+='<button class="btn green" data-act="mark" data-id="'+o.id+'" data-to="YES">✅ Yes</button>';
-    btns+='<button class="btn red" data-act="mark" data-id="'+o.id+'" data-to="CLOSED">✗ Close</button>';
-  } else if(o.status==="YES"){
-    btns+='<button class="btn amber" data-act="mark" data-id="'+o.id+'" data-to="PUBLISHED">📄 Published</button>';
-    btns+='<button class="btn red" data-act="mark" data-id="'+o.id+'" data-to="NO">✗ Declined</button>';
-  } else if(o.status==="PUBLISHED"){
-    btns+='<button class="btn green" data-act="mark" data-id="'+o.id+'" data-to="PAID">💰 Paid</button>';
-  } else if(o.status==="PAUSED"||o.status==="NO"||o.status==="CLOSED"){
-    btns+='<button class="btn blue" data-act="mark" data-id="'+o.id+'" data-to="PITCHED">↩ Reopen</button>';
-  }
-  btns+='<button class="btn" data-act="edit" data-id="'+o.id+'">✏️ Edit</button>';
-
-  var logh='';
-  if(o.log&&o.log.length){
-    logh='<div class="log">'+o.log.slice().reverse().map(l=>'<div><span class="d">'+fmt(l.d)+'</span>'+esc(l.e)+'</div>').join("")+'</div>';
-  }
-  var noteh=o.notes?'<div class="note">📝 '+esc(o.notes)+'</div>':"";
-
+  var web=o.website?'<span class="tiny">· <a href="'+esc(o.website)+'" target="_blank" rel="noopener">website ↗</a></span>':"";
   var h='<div class="card '+cardClass(o)+'">';
-  h+='<div class="cardrow"><div style="min-width:0"><div class="cardtitle">'+esc(o.name)+' '+(web?'<span style="font-size:12px;color:var(--dim)">'+web+'</span>':'')+'</div></div><span class="st st-'+o.status+'">'+ST_LABEL[o.status]+'</span></div>';
-  h+=cd;
-  h+='<div class="meta"><span>'+d1+'</span><span>'+d2+'</span><span>'+d3+'</span><span>Box: <b>'+esc(o.box)+'</b></span><span class="full">💡 <b>'+esc(o.claim)+'</b></span></div>';
-  if(o.editorName||o.editorEmail) h+='<div class="meta"><span>👤 <b>'+esc(o.editorName||"—")+'</b></span><span>✉️ '+esc(o.editorEmail||"")+'</span></div>';
-  h+='<div class="btns">'+btns+'</div>';
-  h+=noteh;
-  if(o.kit||o.offLimits){
-    h+='<details><summary>Box kit & off-limits</summary><div class="note" style="margin-top:4px">📦 <b>Kit:</b> '+esc(o.kit||"—")+'<br>🚫 <b>Off-limits:</b> '+esc(o.offLimits||"—")+'</div></details>';
+  h+='<div class="cardrow"><div class="cardtitle">'+esc(o.name)+' '+web+'</div><span class="pill pill-'+o.status+'">'+ST_LABEL[o.status]+'</span></div>';
+  h+=countdownHTML(o);
+  var btns=actionButtons(o);
+  if(btns) h+='<div class="bigbtns">'+btns+'</div>';
+  h+='<details><summary><span class="arrow">▶</span> Details</summary><div class="det">';
+  var rows="";
+  rows+='<div class="detrow"><span class="k">Pitched on</span><span class="v">'+(o.pitchDate?fmt(o.pitchDate):"<span style='color:var(--amber)'>not set yet</span>")+'</span></div>';
+  rows+='<div class="detrow"><span class="k">Send reminder on</span><span class="v">'+fmt(nudgeDate(o))+'</span></div>';
+  rows+='<div class="detrow"><span class="k">Close it after</span><span class="v">'+fmt(closeDate(o))+'</span></div>';
+  if(o.editorName||o.editorEmail) rows+='<div class="detrow"><span class="k">Editor</span><span class="v">'+esc(o.editorName||"—")+(o.editorEmail?'<br><span style="font-weight:500;font-size:12.5px;color:var(--dim)">'+esc(o.editorEmail)+'</span>':"")+'</span></div>';
+  if(o.wordCount||o.pay) rows+='<div class="detrow"><span class="k">Length / pay</span><span class="v">'+esc(o.wordCount||"—")+(o.pay?" · "+esc(o.pay):"")+'</span></div>';
+  if(o.payMethod) rows+='<div class="detrow"><span class="k">Payment method</span><span class="v">'+esc(o.payMethod)+'</span></div>';
+  if(o.publishedLink) rows+='<div class="detrow"><span class="k">Published</span><span class="v"><a href="'+esc(o.publishedLink)+'" target="_blank" rel="noopener">link ↗</a></span></div>';
+  h+=rows;
+  h+='<div class="note"><b>💡 The idea:</b> '+esc(o.claim||"—")+'</div>';
+  if(o.kit) h+='<div class="note"><b>📦 Your material (only these scenes):</b> '+esc(o.kit)+'</div>';
+  if(o.offLimits) h+='<div class="note"><b>🚫 Don\'t use (belongs to another story):</b> '+esc(o.offLimits)+'</div>';
+  if(o.notes) h+='<div class="note"><b>📝 Notes:</b> '+esc(o.notes)+'</div>';
+  if(o.log&&o.log.length){
+    h+='<div class="log">'+o.log.slice().reverse().map(function(l){return '<div><span class="d">'+fmt(l.d)+'</span>'+esc(l.e)+'</div>';}).join("")+'</div>';
   }
-  h+=logh;
-  h+='</div>';
+  h+='<div class="bigbtns"><button class="bbtn blue" data-act="edit" data-id="'+o.id+'">✏️ Edit this pitch</button></div>';
+  h+='</div></details></div>';
   return h;
-}
-
-/* ================= RENDER: OPPORTUNITIES ================= */
-var oppFilter=0;
-function renderOpps(){
-  var el=document.getElementById("tab-opps");
-  var h='<div class="filters">';
-  [["0","All"],["1","Tier 1 — publish this week"],["2","Tier 2 — pitch now"],["3","Tier 3 — watchlist"]].forEach(f=>{
-    var n=state.opps.filter(o=>String(o.tier)===f[0]).length;
-    h+='<button class="fchip'+(String(oppFilter)===f[0]?" on":"")+'" data-oppfilter="'+f[0]+'">'+f[1]+' ('+n+')</button>';
-  });
-  h+='</div>';
-  var tiers=oppFilter?[oppFilter]:[1,2,3];
-  tiers.forEach(t=>{
-    var list=state.opps.filter(o=>o.tier===t);
-    if(!list.length) return;
-    h+='<div class="opp-tier">'+(t===1?"Tier 1 — Publish this week":t===2?"Tier 2 — Pitch now":"Tier 3 — Watchlist (need clips first)")+'</div>';
-    list.forEach(o=>{
-      var stc={ "not-started":"Not started","pitched":"Pitched","accepted":"Accepted","declined":"Declined","done":"Done" };
-      h+='<div class="card opp"><div class="cardrow"><div style="min-width:0"><div class="cardtitle">'+esc(o.name)+'</div><div class="countdown" style="font-size:12.5px;color:var(--dim)">'+esc(o.how)+'</div></div><select data-oppstatus="'+o.id+'">'+Object.keys(stc).map(k=>'<option value="'+k+'"'+(o.status===k?" selected":"")+'>'+stc[k]+'</option>').join("")+'</select></div>';
-      h+='<div class="meta"><span class="full" style="color:var(--accent)">💰 '+esc(o.pay)+'</span></div>';
-      if(o.link) h+='<div class="meta"><span class="full">🔗 <a href="'+esc(o.link)+'" target="_blank" rel="noopener" style="color:var(--blue)">'+esc(o.link)+'</a></span></div>';
-      if(o.notes) h+='<div class="note">'+esc(o.notes)+'</div>';
-      h+='</div>';
-    });
-  });
-  el.innerHTML=h;
-}
-
-/* ================= RENDER: BOXES ================= */
-function renderBoxes(){
-  var el=document.getElementById("tab-boxes");
-  var h='<div class="note" style="margin-bottom:10px">🎓 <b>The rule:</b> a kit opens only when its box says YES. Every scene belongs to exactly one essay. Same event, different job = allowed. Same event, same job = forbidden.</div>';
-  state.boxes.forEach(b=>{
-    var outlets=state.outlets.filter(o=>o.box===b.name).map(o=>o.name);
-    h+='<div class="card"><div class="cardrow"><div class="cardtitle">'+esc(b.name)+'<span class="badge-'+b.status+'">'+b.status+'</span></div></div>';
-    h+='<div class="countdown" style="font-size:13px">💡 '+esc(b.claim)+'</div>';
-    h+='<div class="boxkit"><b>📦 Kit (owned scenes):</b></div><ul class="kitlist">'+b.kit.map(k=>'<li>'+esc(k)+'</li>').join("")+'</ul>';
-    h+='<div class="boxkit"><b>🚫 Off-limits (belongs elsewhere):</b></div><ul class="kitlist">'+b.offLimits.map(k=>'<li>'+esc(k)+'</li>').join("")+'</ul>';
-    if(outlets.length) h+='<div class="boxkit" style="margin-top:6px">🔗 Linked: <b>'+esc(outlets.join(", "))+'</b></div>';
-    h+='</div>';
-  });
-  el.innerHTML=h;
 }
 
 /* ================= RENDER: DRAFTS ================= */
@@ -500,150 +466,153 @@ function renderDrafts(){
   var el=document.getElementById("tab-drafts");
   if(state._openDraft){ renderDraftEditor(state._openDraft); return; }
   var total=0; state.drafts.forEach(function(d){ total+=wordCount(d.text); });
-  var h='<h2>📝 Drafts <span class="count">'+state.drafts.length+' · '+total+' words total</span></h2>';
-  h+='<div class="btns" style="margin-bottom:10px"><button class="btn green" data-act="newdraft">＋ New draft</button></div>';
-  if(!state.drafts.length){
-    h+='<div class="empty">No drafts yet. Click "＋ New draft" and paste anything — essays, notes, paragraphs, pitches. It auto-saves on this device.</div>';
-  }
-  state.drafts.slice().sort(function(a,b){ return (b.updated||"").localeCompare(a.updated||""); }).forEach(function(d){
-    h+='<div class="card"><div class="cardrow"><div style="min-width:0"><div class="cardtitle">'+esc(d.title||"Untitled")+'</div><div class="countdown" style="font-size:12px;color:var(--dim)">'+wordCount(d.text)+' words · updated '+fmt(d.updated)+(d.outlet?' · 🏷 '+esc(d.outlet):'')+'</div></div></div><div class="btns"><button class="btn blue" data-act="opendraft" data-id="'+d.id+'">✏️ Open</button><button class="btn red" data-act="deletedraft" data-id="'+d.id+'">🗑</button></div></div>';
+  var h='<h2>📝 Drafts <span class="count">'+state.drafts.length+' · '+total+' words</span></h2>';
+  h+='<div class="note" style="margin-bottom:12px"><b>Your big box:</b> paste anything here — drafts, notes, whole essays. It saves itself as you type.</div>';
+  h+='<button class="bbtn green" data-act="newdraft" style="width:100%;margin-bottom:14px">＋ New draft</button>';
+  if(!state.drafts.length) h+='<div class="empty">No drafts yet. Click "＋ New draft" and paste something.</div>';
+  state.drafts.slice().sort(function(a,b){return (b.updated||"").localeCompare(a.updated||"");}).forEach(function(d){
+    h+='<div class="card"><div class="cardrow"><div style="min-width:0"><div class="cardtitle">'+esc(d.title||"Untitled")+'</div><div class="sub" style="font-size:12.5px;color:var(--dim)">'+wordCount(d.text)+' words · edited '+fmt(d.updated)+(d.outlet?' · 🏷 '+esc(d.outlet):"")+'</div></div></div><div class="bigbtns"><button class="bbtn blue" data-act="opendraft" data-id="'+d.id+'">✏️ Open</button><button class="bbtn red" style="flex:0 0 auto;min-width:64px" data-act="deletedraft" data-id="'+d.id+'">🗑</button></div></div>';
   });
   el.innerHTML=h;
 }
-
 function renderDraftEditor(id){
-  var d=state.drafts.find(function(x){ return x.id===id; });
+  var d=state.drafts.find(function(x){return x.id===id;});
   if(!d){ state._openDraft=null; renderDrafts(); return; }
   var el=document.getElementById("tab-drafts");
-  var h='<h2>📝 Draft editor</h2>';
-  h+='<div class="card"><div class="btns"><button class="btn dim" data-act="backdrafts">← Back to list</button><button class="btn green" data-act="copydraft" data-id="'+d.id+'">📋 Copy all</button><button class="btn red" data-act="deletedraft" data-id="'+d.id+'">🗑 Delete</button></div></div>';
-  h+='<div class="card"><div class="meta"><span class="full">Title: <input class="inline-input" id="d_title" style="width:100%" value="'+esc(d.title)+'"></span><span class="full">Outlet tag (optional): <input class="inline-input" id="d_outlet" style="width:100%" value="'+esc(d.outlet||"")+'"></span><span class="full" id="d_stats">'+wordCount(d.text)+' words</span></div>';
-  h+='<textarea id="d_text" placeholder="Paste your draft here… it auto-saves.">'+esc(d.text)+'</textarea>';
-  h+='<div class="hint" id="d_saved">Autosave is on · last saved '+fmt(d.updated)+' · data stays on this device</div></div>';
+  var h='<h2>📝 Writing</h2>';
+  h+='<div class="bigbtns" style="margin-bottom:10px"><button class="bbtn gray" data-act="backdrafts">← Back</button><button class="bbtn green" data-act="copydraft" data-id="'+d.id+'">📋 Copy all</button><button class="bbtn red" data-act="deletedraft" data-id="'+d.id+'">🗑 Delete</button></div>';
+  h+='<div class="card"><div class="detrow"><span class="k">Title</span></div><input class="inline-input" id="d_title" style="width:100%;margin-bottom:10px" value="'+esc(d.title)+'">';
+  h+='<div class="detrow"><span class="k">Outlet tag (optional)</span></div><input class="inline-input" id="d_outlet" style="width:100%;margin-bottom:10px" value="'+esc(d.outlet||"")+'">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="hint" id="d_stats">'+wordCount(d.text)+' words</span><span class="hint" id="d_saved">saved '+fmt(d.updated)+'</span></div>';
+  h+='<textarea id="d_text" placeholder="Paste your draft here… it saves itself.">'+esc(d.text)+'</textarea></div>';
   el.innerHTML=h;
-  var ta=document.getElementById("d_text");
-  var ti=document.getElementById("d_title");
-  var oi=document.getElementById("d_outlet");
-  var timer=null;
-  function saveDraftNow(){
-    d.title=ti.value; d.outlet=oi.value; d.text=ta.value; d.updated=todayISO();
-    save(state);
+  var ta=document.getElementById("d_text"), ti=document.getElementById("d_title"), oi=document.getElementById("d_outlet"), timer=null;
+  function saveNow(){
+    d.title=ti.value; d.outlet=oi.value; d.text=ta.value; d.updated=todayISO(); save(state);
     var st=document.getElementById("d_stats"); if(st) st.textContent=wordCount(d.text)+" words";
-    var sv=document.getElementById("d_saved"); if(sv) sv.textContent="Autosave is on · saved "+new Date().toLocaleTimeString();
+    var sv=document.getElementById("d_saved"); if(sv) sv.textContent="saved "+new Date().toLocaleTimeString();
   }
-  function debounceSave(){ clearTimeout(timer); timer=setTimeout(saveDraftNow,600); }
-  ta.addEventListener("input",debounceSave);
-  ti.addEventListener("input",debounceSave);
-  oi.addEventListener("input",debounceSave);
+  function debounce(){ clearTimeout(timer); timer=setTimeout(saveNow,600); }
+  ta.addEventListener("input",debounce); ti.addEventListener("input",debounce); oi.addEventListener("input",debounce);
+}
+function copyDraft(id){
+  var d=state.drafts.find(function(x){return x.id===id;}); if(!d) return;
+  var txt=d.text||"";
+  function fb(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); toast("Copied ✓"); }catch(e){ toast("Copy failed — select text manually"); } t.remove(); }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Copied to clipboard ✓");},fb); } else { fb(); }
 }
 
-function copyDraft(id){
-  var d=state.drafts.find(function(x){ return x.id===id; }); if(!d) return;
-  var txt=d.text||"";
-  function fb(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); toast("Copied to clipboard ✓"); }catch(e){ toast("Copy failed — select the text manually"); } t.remove(); }
-  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){ toast("Copied to clipboard ✓"); },fb); } else { fb(); }
+/* ================= RENDER: IDEAS ================= */
+var oppFilter=0;
+function renderOpps(){
+  var el=document.getElementById("tab-opps");
+  var h='<h2>💡 Ideas <span class="count">'+state.opps.length+'</span></h2>';
+  h+='<div class="note" style="margin-bottom:12px"><b>Where else to publish.</b> Tier 1 = do this week. Tier 2 = pitch when ready. Tier 3 = once you have clips.</div>';
+  h+='<div class="filters">';
+  [["0","All"],["1","Tier 1 — do this week"],["2","Tier 2 — pitch when ready"],["3","Tier 3 — later"]].forEach(function(f){
+    var n=state.opps.filter(function(o){return String(o.tier)===f[0];}).length;
+    h+='<button class="fchip'+(String(oppFilter)===f[0]?" on":"")+'" data-oppfilter="'+f[0]+'">'+f[1]+' ('+n+')</button>';
+  });
+  h+='</div>';
+  var tiers=oppFilter?[oppFilter]:[1,2,3];
+  var stc={"not-started":"Not started","pitched":"Pitched","accepted":"Accepted","declined":"Declined","done":"Done"};
+  tiers.forEach(function(t){
+    var list=state.opps.filter(function(o){return o.tier===t;});
+    if(!list.length) return;
+    h+='<div class="tier">'+(t===1?"Tier 1 — do this week":t===2?"Tier 2 — pitch when ready":"Tier 3 — once you have clips")+'</div>';
+    list.forEach(function(o){
+      h+='<div class="card opp"><div class="cardrow"><div style="min-width:0"><div class="opname">'+esc(o.name)+'</div><div class="opay">💰 '+esc(o.pay)+'</div></div><select data-oppstatus="'+o.id+'">'+Object.keys(stc).map(function(k){return '<option value="'+k+'"'+(o.status===k?" selected":"")+'>'+stc[k]+'</option>';}).join("")+'</select></div>';
+      h+='<details><summary><span class="arrow">▶</span> How to submit</summary><div class="det">';
+      if(o.link) h+='<div class="detrow"><span class="k">Website</span><span class="v"><a href="'+esc(o.link)+'" target="_blank" rel="noopener">open ↗</a></span></div>';
+      h+='<div class="note">'+esc(o.how)+(o.notes?"\n\n"+esc(o.notes):"")+'</div>';
+      h+='</div></details></div>';
+    });
+  });
+  el.innerHTML=h;
 }
 
 /* ================= RENDER: SETTINGS ================= */
 function renderSettings(){
   var el=document.getElementById("tab-settings");
-  var paid=state.outlets.filter(o=>o.status==="PAID").length;
-  var yes=state.outlets.filter(o=>o.status==="YES").length;
-  var pub=state.outlets.filter(o=>["PUBLISHED","PAID"].includes(o.status)).length;
   var total=state.outlets.length;
-  var reply=state.outlets.filter(o=>["YES","NO","PUBLISHED","PAID"].includes(o.status)).length;
-  var h='<div class="card"><div class="cardtitle" style="margin-bottom:8px">📊 Pipeline health</div>';
-  h+='<div class="meta"><span>Total pitches: <b>'+total+'</b></span><span>Active: <b>'+state.outlets.filter(o=>ACTIVE.includes(o.status)).length+'</b></span><span>Yes: <b>'+yes+'</b></span><span>Published: <b>'+pub+'</b></span><span>Paid: <b>'+paid+'</b></span><span>Reply rate: <b>'+total?Math.round(reply/total*100)+"%":"0%"+'</b></span></div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:8px">✏️ App name</div><div class="field"><input id="setName" value="'+esc(state.appName)+'"><div class="hint">Shown in the header — rename freely.</div></div><button class="btn green" data-act="savename">Save name</button></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:8px">💾 Backup & restore</div>';
-  h+='<div class="meta" style="margin-bottom:8px"><span class="full">Your data lives in this browser. Export a backup file — and keep it safe. Import restores everything.</span></div>';
-  h+='<div class="btns"><button class="btn green" data-act="export">⬇ Export backup (JSON)</button><label class="btn blue" style="display:inline-block">⬆ Import backup<input type="file" id="importFile" accept=".json" style="display:none"></label><button class="btn red" data-act="reset">🗑 Reset all data</button><button class="btn red" data-act="wipe">🧹 Wipe data (start empty)</button></div><div class="hint" style="margin-top:6px">Reset = back to the original seed. Wipe = empty everything (outlets, boxes, drafts) — use before sharing the app publicly, or for a fresh start.</div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:4px">📅 Dates to remember</div><div class="meta"><span class="full">Afrolicious follow-up: <b>4–7 Sep 2026</b></span><span class="full">2 new pitches due: <b>~21 Aug</b></span><span class="full">Byline kit reserved (paused by choice)</span></div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:4px">🧭 Quick rules</div><div class="meta"><span class="full">1) One kit, one box — nothing written for a WAITING box</span><span class="full">2) When one replies → draft ONLY that one</span><span class="full">3) Closed box recycles → kit returns to the pool</span><span class="full">4) Same event, same job in two essays = forbidden</span></div></div>';
+  var yes=state.outlets.filter(function(o){return o.status==="YES";}).length;
+  var pub=state.outlets.filter(function(o){return ["PUBLISHED","PAID"].includes(o.status);}).length;
+  var paid=state.outlets.filter(function(o){return o.status==="PAID";}).length;
+  var h='<h2>⚙️ Settings</h2>';
+  h+='<div class="statgrid"><div class="stat"><div class="n">'+total+'</div><div class="t">Pitches sent</div></div><div class="stat"><div class="n">'+yes+'</div><div class="t">Accepted 🎉</div></div><div class="stat"><div class="n">'+pub+'</div><div class="t">Published 📄</div></div><div class="stat"><div class="n">'+paid+'</div><div class="t">Paid 💰</div></div></div>';
+  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">✏️ App name</div><div class="field"><input id="setName" value="'+esc(state.appName)+'"></div><button class="bbtn green" data-act="savename">Save name</button></div>';
+  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">💾 Back up your data</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px">Everything lives on your phone. Export a file to keep it safe; import to restore it on another phone.</p><div class="bigbtns"><button class="bbtn green" data-act="export">⬇ Export backup</button><label class="bbtn blue" style="display:inline-block;text-align:center">⬆ Import backup<input type="file" id="importFile" accept=".json" style="display:none"></label></div></div>';
+  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">🧹 Start over</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px"><b>Wipe:</b> clears everything — use before sharing the app, or for a fresh start. <b>Reset:</b> back to the original examples.</p><div class="bigbtns"><button class="bbtn red" data-act="wipe">🧹 Wipe everything</button><button class="bbtn gray" data-act="reset">↩️ Reset examples</button></div></div>';
+  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">📖 What is this app?</div><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>My Pitches</b> — every place you sent a story. The big number = days until you send a polite reminder. Red = do it now.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Drafts</b> — paste any writing here; it saves itself.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Ideas</b> — new places to publish, with pay and how to submit.</p><p style="font-size:14px;color:var(--dim)"><b>Material rule</b> — each story has its own scenes. A scene used in one story stays out of the others (that\'s the whole secret of your portfolio).</p></div>';
   el.innerHTML=h;
 }
 
-/* ================= ESCAPE ================= */
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-
-/* ================= MODAL: OUTLET FORM ================= */
+/* ================= MODAL (add/edit pitch) ================= */
 function outletForm(o){
   o=o||{};
-  var f=function(name,val){ return val==null?"":esc(val); };
-  var h='<div class="modal-box"><h3>'+(o.id?"Edit outlet":"New outlet")+'</h3>';
-  h+='<div class="field"><label>Outlet name *</label><input id="f_name" value="'+f("",o.name)+'" placeholder="e.g. TechCabal"></div>';
-  h+='<div class="field"><label>Website</label><input id="f_website" value="'+f("",o.website)+'" placeholder="https://…"></div>';
-  h+='<div class="field"><label>Type</label><select id="f_type"><option>Magazine</option><option>Platform</option><option>Newsletter</option><option>Journal</option><option>Contest</option></select></div>';
-  h+='<div class="field"><label>Status</label><select id="f_status">'+STATUS.map(s=>'<option'+(o.status===s?" selected":"")+'>'+s+'</option>').join("")+'</select></div>';
-  h+='<div class="field"><label>Box (kit owner)</label><select id="f_box">'+["OPEN","SEALED","PAUSED","CLOSED"].map(b=>'<option'+(o.box===b?" selected":"")+'>'+b+'</option>').join("")+'</select></div>';
-  h+='<div class="field"><label>Date pitched</label><input type="date" id="f_pitch" value="'+f("",o.pitchDate)+'"><div class="hint">Starts the countdown. Leave empty until you know it.</div></div>';
-  h+='<div class="field"><label>Nudge after (days)</label><input type="number" id="f_nudge" min="1" value="'+(o.nudgeDays||21)+'"></div>';
-  h+='<div class="field"><label>Close after (days)</label><input type="number" id="f_close" min="1" value="'+(o.closeDays||42)+'"></div>';
-  h+='<div class="field"><label>Editor name</label><input id="f_editor" value="'+f("",o.editorName)+'"></div>';
-  h+='<div class="field"><label>Editor email</label><input id="f_email" value="'+f("",o.editorEmail)+'"></div>';
-  h+='<div class="field"><label>One-sentence claim</label><textarea id="f_claim">'+f("",o.claim)+'</textarea></div>';
-  h+='<div class="field"><label>Kit (scenes this essay owns)</label><textarea id="f_kit">'+f("",o.kit)+'</textarea></div>';
-  h+='<div class="field"><label>Off-limits (belongs to other boxes)</label><textarea id="f_off">'+f("",o.offLimits)+'</textarea></div>';
-  h+='<div class="field"><label>Word count</label><input id="f_words" value="'+f("",o.wordCount)+'"></div>';
-  h+='<div class="field"><label>Pay</label><input id="f_pay" value="'+f("",o.pay)+'"></div>';
-  h+='<div class="field"><label>Payment method</label><input id="f_method" value="'+f("",o.payMethod)+'"></div>';
-  h+='<div class="field"><label>Published link</label><input id="f_publink" value="'+f("",o.publishedLink)+'"></div>';
-  h+='<div class="field"><label>Notes</label><textarea id="f_notes">'+f("",o.notes)+'</textarea></div>';
-  h+='<div class="modal-actions"><button class="btn green" data-act="saveoutlet" data-id="'+f("",o.id)+'">💾 Save</button><button class="btn dim" data-act="closemodal">Cancel</button></div>';
+  function f(n){ return o[n]==null?"":esc(o[n]); }
+  var h='<div class="modal-box"><h3>'+(o.id?"Edit pitch":"New pitch")+'</h3>';
+  h+='<div class="field"><label>Publication name *</label><input id="f_name" value="'+f("name")+'" placeholder="e.g. TechCabal"></div>';
+  h+='<div class="field"><label>Website</label><input id="f_website" value="'+f("website")+'" placeholder="https://…"></div>';
+  h+='<div class="field"><label>Status</label><select id="f_status">'+STATUS.map(function(s){return '<option'+(o.status===s?" selected":"")+'>'+s+'</option>';}).join("")+'</select></div>';
+  h+='<div class="field"><label>Story folder</label><select id="f_box">'+["OPEN","SEALED","PAUSED","CLOSED"].map(function(b){return '<option'+(o.box===b?" selected":"")+'>'+b+'</option>';}).join("")+'</select><div class="hint">Ready to write = open · Wait for their yes = sealed · On hold = paused</div></div>';
+  h+='<div class="field"><label>Date you pitched</label><input type="date" id="f_pitch" value="'+f("pitchDate")+'"><div class="hint">This starts the countdown.</div></div>';
+  h+='<div class="field"><label>Send reminder after (days)</label><input type="number" id="f_nudge" min="1" value="'+(o.nudgeDays||21)+'"></div>';
+  h+='<div class="field"><label>Close it after (days)</label><input type="number" id="f_close" min="1" value="'+(o.closeDays||42)+'"></div>';
+  h+='<div class="field"><label>Editor name</label><input id="f_editor" value="'+f("editorName")+'"></div>';
+  h+='<div class="field"><label>Editor email</label><input id="f_email" value="'+f("editorEmail")+'"></div>';
+  h+='<div class="field"><label>The idea (one sentence)</label><textarea id="f_claim">'+f("claim")+'</textarea></div>';
+  h+='<div class="field"><label>Your material (scenes only this story can use)</label><textarea id="f_kit">'+f("kit")+'</textarea></div>';
+  h+='<div class="field"><label>Don\'t use (belongs to another story)</label><textarea id="f_off">'+f("offLimits")+'</textarea></div>';
+  h+='<div class="field"><label>Length</label><input id="f_words" value="'+f("wordCount")+'"></div>';
+  h+='<div class="field"><label>Pay</label><input id="f_pay" value="'+f("pay")+'"></div>';
+  h+='<div class="field"><label>Payment method</label><input id="f_method" value="'+f("payMethod")+'"></div>';
+  h+='<div class="field"><label>Published link</label><input id="f_publink" value="'+f("publishedLink")+'"></div>';
+  h+='<div class="field"><label>Notes</label><textarea id="f_notes">'+f("notes")+'</textarea></div>';
+  h+='<div class="modal-actions"><button class="bbtn green" data-act="saveoutlet" data-id="'+f("id")+'">💾 Save</button><button class="bbtn gray" data-act="closemodal">Cancel</button></div>';
   h+='</div>';
   return h;
 }
-
 function openModal(html){ var m=document.getElementById("modal"); m.innerHTML=html; m.classList.add("on"); }
 function closeModal(){ document.getElementById("modal").classList.remove("on"); }
 
 /* ================= ACTIONS ================= */
 function markStatus(id,to){
-  var o=state.outlets.find(x=>x.id===id); if(!o) return;
+  var o=state.outlets.find(function(x){return x.id===id;}); if(!o) return;
   o.status=to;
   var d=todayISO();
-  if(to==="NUDGED1") o.log.push({d:d,e:"Nudge #1 sent."});
-  if(to==="NUDGED2") o.log.push({d:d,e:"Nudge #2 sent."});
-  if(to==="YES") o.log.push({d:d,e:"EDITOR SAID YES."});
-  if(to==="NO") o.log.push({d:d,e:"Declined — kit returns to the pool."});
-  if(to==="CLOSED") o.log.push({d:d,e:"Thread closed (no reply)."});
-  if(to==="PUBLISHED") o.log.push({d:d,e:"Published!"});
+  if(to==="NUDGED1") o.log.push({d:d,e:"Reminder #1 sent."});
+  if(to==="NUDGED2") o.log.push({d:d,e:"Reminder #2 sent."});
+  if(to==="YES") o.log.push({d:d,e:"THEY SAID YES 🎉."});
+  if(to==="NO") o.log.push({d:d,e:"No — material returns to the pool."});
+  if(to==="CLOSED") o.log.push({d:d,e:"Closed (no reply)."});
+  if(to==="PUBLISHED") o.log.push({d:d,e:"Published 📄."});
   if(to==="PAID") o.log.push({d:d,e:"Paid 💰."});
-  if(to==="PAUSED") o.log.push({d:d,e:"Paused (by choice)."});
+  if(to==="PAUSED") o.log.push({d:d,e:"On hold (by choice)."});
   if(to==="PITCHED") o.log.push({d:d,e:"Reopened."});
   save(state); renderAll();
 }
-
 function saveOutlet(id){
-  var g=function(x){ return document.getElementById(x).value; };
+  function g(x){ return document.getElementById(x).value; }
   var isNew=!id;
-  var o=isNew?{id:"o"+Date.now(),log:[]}:state.outlets.find(x=>x.id===id);
-  o.name=g("f_name")||"Untitled"; o.website=g("f_website"); o.type=g("f_type");
-  o.status=g("f_status"); o.box=g("f_box"); o.pitchDate=g("f_pitch");
-  o.nudgeDays=parseInt(g("f_nudge"),10)||21; o.closeDays=parseInt(g("f_close"),10)||42;
-  o.editorName=g("f_editor"); o.editorEmail=g("f_email"); o.claim=g("f_claim");
-  o.kit=g("f_kit"); o.offLimits=g("f_off"); o.wordCount=g("f_words");
-  o.pay=g("f_pay"); o.payMethod=g("f_method"); o.publishedLink=g("f_publink"); o.notes=g("f_notes");
+  var o=isNew?{id:"o"+Date.now(),log:[]}:state.outlets.find(function(x){return x.id===id;});
+  o.name=g("f_name")||"Untitled"; o.website=g("f_website"); o.status=g("f_status"); o.box=g("f_box");
+  o.pitchDate=g("f_pitch"); o.nudgeDays=parseInt(g("f_nudge"),10)||21; o.closeDays=parseInt(g("f_close"),10)||42;
+  o.editorName=g("f_editor"); o.editorEmail=g("f_email"); o.claim=g("f_claim"); o.kit=g("f_kit"); o.offLimits=g("f_off");
+  o.wordCount=g("f_words"); o.pay=g("f_pay"); o.payMethod=g("f_method"); o.publishedLink=g("f_publink"); o.notes=g("f_notes");
   if(isNew) state.outlets.push(o);
   save(state); closeModal(); renderAll();
 }
-
 function exportData(){
   var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  var a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="pitchledger-backup-"+todayISO()+".json";
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="pitchledger-backup-"+todayISO()+".json";
+  document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
 }
 function importData(file){
   var r=new FileReader();
   r.onload=function(){
-    try{
-      var s=JSON.parse(r.result);
-      if(!s.outlets) throw new Error("bad");
-      state=s; save(state); renderAll(); alert("✅ Backup imported.");
-    }catch(e){ alert("❌ That file doesn't look like a PitchLedger backup."); }
+    try{ var s=JSON.parse(r.result); if(!s.outlets) throw new Error("bad"); if(!s.drafts) s.drafts=[]; state=s; save(state); renderAll(); toast("Backup imported ✓"); }
+    catch(e){ toast("That file isn't a PitchLedger backup"); }
   };
   r.readAsText(file);
 }
@@ -651,30 +620,30 @@ function importData(file){
 /* ================= EVENTS ================= */
 document.addEventListener("click",function(e){
   var t=e.target;
-  while(t && !t.getAttribute("data-act")) t=t.parentElement;
+  while(t&&!t.getAttribute("data-act")) t=t.parentElement;
   if(!t) return;
-  var act=t.getAttribute("data-act");
-  var id=t.getAttribute("data-id");
-  if(act==="mark"){ markStatus(id,t.getAttribute("data-to")); }
-  else if(act==="edit"){ var o=state.outlets.find(x=>x.id===id); openModal(outletForm(o)); }
+  var act=t.getAttribute("data-act"), id=t.getAttribute("data-id");
+  if(act==="welcomedone"){ sset("welcomeSeen","1"); renderToday(); }
+  else if(act==="mark"){ markStatus(id,t.getAttribute("data-to")); }
+  else if(act==="edit"){ var o=state.outlets.find(function(x){return x.id===id;}); openModal(outletForm(o)); }
   else if(act==="newoutlet"){ openModal(outletForm(null)); }
   else if(act==="saveoutlet"){ saveOutlet(id); }
   else if(act==="closemodal"){ closeModal(); }
   else if(act==="export"){ exportData(); }
-  else if(act==="reset"){ if(confirm("Reset ALL data to the original seed? This cannot be undone.")){ state=seed(); save(state); renderAll(); } }
-  else if(act==="wipe"){ if(confirm("Wipe ALL data (outlets, boxes, drafts, tasks)? Export a backup first if you want to keep anything. This cannot be undone.")){ state.outlets=[]; state.opps=[]; state.boxes=[]; state.tasks=[]; state.drafts=[]; state._openDraft=null; save(state); renderAll(); toast("All data wiped — starting clean"); } }
+  else if(act==="reset"){ if(confirm("Reset to the original examples? This replaces your data.")){ state=seed(); save(state); renderAll(); toast("Reset to examples"); } }
+  else if(act==="wipe"){ if(confirm("Wipe EVERYTHING? Export a backup first if you want to keep anything.")){ state.outlets=[]; state.opps=[]; state.boxes=[]; state.tasks=[]; state.drafts=[]; state._openDraft=null; save(state); renderAll(); toast("Wiped — clean start"); } }
+  else if(act==="savename"){ var n=document.getElementById("setName").value; state.appName=n||"PitchLedger"; save(state); renderAll(); }
+  else if(act==="addtask"){ var inp=document.getElementById("newTask"); var v=(inp.value||"").trim(); if(v){ state.tasks.push({t:v,done:false}); save(state); renderAll(); } }
   else if(act==="newdraft"){ var nd={id:"d"+Date.now(),title:"Untitled draft",outlet:"",updated:todayISO(),text:""}; state.drafts.push(nd); state._openDraft=nd.id; save(state); renderDrafts(); }
   else if(act==="opendraft"){ state._openDraft=id; renderDrafts(); }
   else if(act==="backdrafts"){ state._openDraft=null; renderDrafts(); }
-  else if(act==="deletedraft"){ var di=state.drafts.findIndex(function(x){ return x.id===id; }); if(di>-1 && confirm("Delete this draft?")){ state.drafts.splice(di,1); if(state._openDraft===id) state._openDraft=null; save(state); renderDrafts(); toast("Draft deleted"); } }
+  else if(act==="deletedraft"){ var di=state.drafts.findIndex(function(x){return x.id===id;}); if(di>-1&&confirm("Delete this draft?")){ state.drafts.splice(di,1); if(state._openDraft===id) state._openDraft=null; save(state); renderDrafts(); toast("Draft deleted"); } }
   else if(act==="copydraft"){ copyDraft(id); }
-  else if(act==="savename"){ var n=document.getElementById("setName").value; state.appName=n||"PitchLedger"; save(state); renderAll(); }
-  else if(act==="addtask"){ var inp=document.getElementById("newTask"); var v=(inp.value||"").trim(); if(v){ state.tasks.push({t:v,done:false}); save(state); renderAll(); } }
 });
 document.addEventListener("change",function(e){
-  if(e.target.id==="importFile" && e.target.files.length){ importData(e.target.files[0]); e.target.value=""; }
+  if(e.target.id==="importFile"&&e.target.files.length){ importData(e.target.files[0]); e.target.value=""; }
   var st=e.target.getAttribute("data-oppstatus");
-  if(st){ var o=state.opps.find(x=>x.id===st); if(o){ o.status=e.target.value; save(state); renderStats(); } }
+  if(st){ var o=state.opps.find(function(x){return x.id===st;}); if(o){ o.status=e.target.value; save(state); renderStats(); } }
   var tk=e.target.getAttribute("data-task");
   if(tk!==null){ state.tasks[+tk].done=e.target.checked; save(state); }
 });
@@ -689,18 +658,14 @@ document.addEventListener("click",function(e){
   var tb=e.target.getAttribute("data-tab");
   if(tb){ switchTab(tb); }
 });
-
 function switchTab(name){
-  document.querySelectorAll(".tabbtn").forEach(b=>b.classList.toggle("on",b.getAttribute("data-tab")===name));
-  document.querySelectorAll(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+name));
+  document.querySelectorAll(".tabbtn").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-tab")===name);});
+  document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("on",s.id==="tab-"+name);});
 }
-
 function renderAll(){
   document.getElementById("appName").textContent=state.appName||"PitchLedger";
-  renderStats(); renderToday(); renderOutlets(); renderOpps(); renderBoxes(); renderDrafts(); renderSettings();
+  renderStats(); renderToday(); renderOutlets(); renderDrafts(); renderOpps(); renderSettings();
 }
-
-/* ================= BOOT ================= */
 state=load();
 renderAll();
 setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
