@@ -1,5 +1,5 @@
 /* PitchLedger service worker — offline cache, network-first for the app shell */
-var CACHE = "pitchledger-v5";
+var CACHE = "pitchledger-v6";
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
     return c.addAll(["./index.html", "./manifest.webmanifest"]);
