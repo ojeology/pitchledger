@@ -156,7 +156,7 @@
   <section id="tab-settings" class="tab"></section>
 </main>
 <div id="modal"></div>
-<div class="footer">PitchLedger v2.3 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
+<div class="footer">PitchLedger v2.4 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
 <script>
 "use strict";
 /* ================= STORAGE ================= */
@@ -315,11 +315,27 @@ function seed(){
 /* ================= STATE ================= */
 var state;
 function load(){
-  var raw = sget("pitchledger_v1");
+  var raw = sget("pitchledger_v2");
   if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets){ if(!s.drafts) s.drafts=[]; return s; } }catch(e){} }
+  /* Migrate from v1 storage: keep user data, merge in new seed entries */
+  var old = sget("pitchledger_v1");
+  if(old){ try{
+    var o = JSON.parse(old);
+    if(o && o.outlets){
+      var ns = seed();
+      ns.outlets.forEach(function(si){ if(!o.outlets.some(function(x){ return x.id===si.id; })) o.outlets.push(si); });
+      if(!o.opps){ o.opps=ns.opps; } else { ns.opps.forEach(function(si){ if(!o.opps.some(function(x){ return x.id===si.id; })) o.opps.push(si); }); }
+      if(!o.boxes) o.boxes=ns.boxes;
+      if(!o.tasks) o.tasks=ns.tasks;
+      if(!o.drafts) o.drafts=[];
+      if(!o.appName) o.appName=ns.appName;
+      sset("pitchledger_v2", JSON.stringify(o));
+      return o;
+    }
+  }catch(e){} }
   var s = seed(); save(s); return s;
 }
-function save(s){ sset("pitchledger_v1", JSON.stringify(s)); }
+function save(s){ sset("pitchledger_v2", JSON.stringify(s)); }
 
 /* ================= DATE HELPERS ================= */
 function parseISO(iso){ if(!iso) return null; var p=iso.split("-"); if(p.length<3) return null; return new Date(+p[0],+p[1]-1,+p[2]); }
@@ -578,6 +594,7 @@ function renderSettings(){
   h+='<div class="statgrid"><div class="stat"><div class="n">'+total+'</div><div class="t">Pitches sent</div></div><div class="stat"><div class="n">'+yes+'</div><div class="t">Accepted 🎉</div></div><div class="stat"><div class="n">'+pub+'</div><div class="t">Published 📄</div></div><div class="stat"><div class="n">'+paid+'</div><div class="t">Paid 💰</div></div></div>';
   h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">✏️ App name</div><div class="field"><input id="setName" value="'+esc(state.appName)+'"></div><button class="bbtn green" data-act="savename">Save name</button></div>';
   h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">💾 Back up your data</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px">Everything lives on your phone. Export a file to keep it safe; import to restore it on another phone.</p><div class="bigbtns"><button class="bbtn green" data-act="export">⬇ Export backup</button><label class="bbtn blue" style="display:inline-block;text-align:center">⬆ Import backup<input type="file" id="importFile" accept=".json" style="display:none"></label></div></div>';
+  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">🔄 Update issues?</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px">If the app looks old or new entries are missing, tap this button — it clears the old saved copy, refreshes the app, and pulls in the latest entries (your pitches and edits are kept).</p><button class="bbtn amber" data-act="forceupdate">🔄 Force update app</button></div>';
   h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">🧹 Start over</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px"><b>Wipe:</b> clears everything — use before sharing the app, or for a fresh start. <b>Reset:</b> back to the original examples.</p><div class="bigbtns"><button class="bbtn red" data-act="wipe">🧹 Wipe everything</button><button class="bbtn gray" data-act="reset">↩️ Reset examples</button></div></div>';
   h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">📖 What is this app?</div><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>My Pitches</b> — every place you sent a story. The big number = days until you send a polite reminder. Red = do it now.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Drafts</b> — paste any writing here; it saves itself.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Ideas</b> — new places to publish, with pay and how to submit.</p><p style="font-size:14px;color:var(--dim)"><b>Material rule</b> — each story has its own scenes. A scene used in one story stays out of the others (that\'s the whole secret of your portfolio).</p></div>';
   el.innerHTML=h;
@@ -668,6 +685,14 @@ document.addEventListener("click",function(e){
   else if(act==="export"){ exportData(); }
   else if(act==="reset"){ if(confirm("Reset to the original examples? This replaces your data.")){ state=seed(); save(state); renderAll(); toast("Reset to examples"); } }
   else if(act==="wipe"){ if(confirm("Wipe EVERYTHING? Export a backup first if you want to keep anything.")){ state.outlets=[]; state.opps=[]; state.boxes=[]; state.tasks=[]; state.drafts=[]; state._openDraft=null; save(state); renderAll(); toast("Wiped — clean start"); } }
+  else if(act==="forceupdate"){
+    if(confirm("Force update: this clears the app's old cache and reloads. Your data is kept. Continue?")){
+      try{ if(navigator.serviceWorker){ navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } }catch(e){}
+      try{ if(window.caches){ caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); }); } }catch(e){}
+      try{ window.localStorage.removeItem("pitchledger_v1"); }catch(e){}
+      setTimeout(function(){ location.reload(); }, 500);
+    }
+  }
   else if(act==="savename"){ var n=document.getElementById("setName").value; state.appName=n||"PitchLedger"; save(state); renderAll(); }
   else if(act==="addtask"){ var inp=document.getElementById("newTask"); var v=(inp.value||"").trim(); if(v){ state.tasks.push({t:v,done:false}); save(state); renderAll(); } }
   else if(act==="newdraft"){ var nd={id:"d"+Date.now(),title:"Untitled draft",outlet:"",updated:todayISO(),text:""}; state.drafts.push(nd); state._openDraft=nd.id; save(state); renderDrafts(); }
