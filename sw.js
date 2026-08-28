@@ -1,5 +1,5 @@
 /* PitchLedger journal — offline cache */
-var CACHE="pitchledger-journal-v8";
+var CACHE="pitchledger-journal-v9";
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(["./index.html","./manifest.webmanifest"]); }).catch(function(){}));
   self.skipWaiting();
