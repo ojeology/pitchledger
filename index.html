@@ -173,6 +173,7 @@ var BOX_LABEL = {OPEN:"Ready to write",SEALED:"Wait for their yes",PAUSED:"On ho
 /* ================= SEED ================= */
 function seed(){
   return {
+    v21:1,
     appName:"PitchLedger",
     outlets:[
       {id:"afrolicious",name:"Afrolicious",website:"https://afrolicious.com",type:"Magazine",status:"YES",box:"OPEN",
@@ -182,6 +183,7 @@ function seed(){
        offLimits:"NumPy battle · power cuts · 'shortcuts' · the bridge · betting shop interior",
        wordCount:"1,000–1,500",pay:"TBD",payMethod:"",
        notes:"Ann said YES (4 Aug): 'very intrigued… would love to publish it… restructuring… reach back out in one month.' Draft ready by 1 Sep. Don't reuse the phone-setup opening or Republic's ending.",
+       aiPolicy:"None stated — write it yourself anyway.",
        publishedLink:"",
        log:[
          {d:"2026-08-04",e:"Ann: very intrigued, wants to publish after restructuring, will follow up in ~1 month."},
@@ -208,8 +210,9 @@ function seed(){
        claim:"AI is changing what ambition looks like for young Nigerians.",
        kit:"Nigerian context · youth · coding culture · self-learning · REPORTING needed (interviews, Lagos fieldwork).",
        offLimits:"'AI + effort = opportunity' ending (Afrolicious owns access) · infrastructure thesis",
-       wordCount:"1,500–3,500",pay:"₦200,000–₦500,000",payMethod:"Bank (naira)",
-       notes:"Quarterly themed issues — verify current call. Needs reporting, not just memoir.",
+       wordCount:"1,500–3,500",pay:"₦21k–₦150k by format (themed calls ₦200k–₦500k)",payMethod:"Bank (naira)",
+       notes:"VERIFIED 28 Aug: pitch via the FORMS at rpublc.com/submissions — NOT email. Rates: Analysis ₦36k · Personal Essay ₦100k · Deep Dive/Reportage ₦150k · themed calls ₦200k–₦500k. Fiction CLOSED. 5% withholding tax. Needs reporting, not just memoir.",
+       aiPolicy:"None stated — original reporting required.",
        publishedLink:"",log:[]},
       {id:"incomedaily",name:"Income Daily",website:"",type:"Newsletter",status:"PITCHED",box:"SEALED",
        pitchDate:"",nudgeDays:14,closeDays:28,editorName:"",editorEmail:"",
@@ -242,6 +245,7 @@ function seed(){
        offLimits:"Essay material (Afrolicious, Byline, Vox scenes) stays out of listicles. No republishing sold articles.",
        wordCount:"1,500+",pay:"£40/article (~$50) + revenue share",payMethod:"PayPal",
        notes:"LOCKED IN. Signed up 8 Aug. Pitch 3 list ideas this week. Approved articles paid at start of next month. No AI in content creation (check policy).",
+       aiPolicy:"No AI in content creation — their stated policy.",
        publishedLink:"",log:[
          {d:"2026-08-08",e:"Locked in — decided to commit. Sign up + pitch list ideas this week."}
        ]},
@@ -254,7 +258,39 @@ function seed(){
        notes:"SENT 8 Aug 2026. Their page: reply ~48h for queries, acceptance a few days, $5 lands within 1–2 weeks. If silent after 7 days, one gentle follow-up, then close at 21 days.",
        publishedLink:"",log:[
          {d:"2026-08-08",e:"Article sent to admin@wonderslist.com — FIRST PAID SUBMISSION 🎯"}
-       ]}
+       ]},
+      {id:"communique",name:"Communiqué",website:"https://www.readcommunique.com/p/pitch-communique",type:"Substack",status:"PITCHED",box:"SEALED",pitchDate:"",nudgeDays:21,closeDays:42,editorName:"David I. Adeleke (editor)",editorEmail:"",
+       claim:"How Telegram mini-apps became Nigeria's new entertainment channel — reported from inside one.",
+       kit:"BRYME data: group growth, ad economics, locked-content model · Telegram mini-app trend across Africa · creator economy numbers.",
+       offLimits:"Personal essay material (Afrolicious owns it) — pitch as reported analysis, not memoir.",
+       wordCount:"1,000–1,500",pay:"₦150,000/story ($100 outside NG)",payMethod:"Bank (naira)",
+       aiPolicy:"None stated — rigorously reported original work expected.",
+       notes:"MUST be subscribed (free) first, then submit via the Google Form on their pitch page. Data-driven + a hook. 40k+ audience. Rolling deadline.",
+       publishedLink:"",log:[]},
+      {id:"statement",name:"STATEMENT Africa",website:"https://statementafrica.com",type:"Magazine",status:"PITCHED",box:"SEALED",pitchDate:"",nudgeDays:28,closeDays:56,editorName:"Chisom Peter Job (Managing Editor)",editorEmail:"chisom@statementafrica.com",
+       claim:"Anime and K-drama demand in Nigeria: the streaming gap young Nigerians are bridging with Telegram.",
+       kit:"BRYME entertainment desk data (what readers actually open) · streaming prices in ₦ · the watchlist economy.",
+       offLimits:"Trading/psychology material · personal essay scenes.",
+       wordCount:"~1,500 (negotiated)",pay:"$0.20–$1.00/word (up to ~$1,500)",payMethod:"USD — Payoneer/Geegpay (open one!)",
+       aiPolicy:"None stated — fresh angles, original work only.",
+       notes:"Email subject: 'PITCH — [headline]' (+ 'Timely' if time-sensitive). MAX 2 pitches per email, then WAIT for reply. Data-backed features favoured; they help build datasets.",
+       publishedLink:"",log:[]},
+      {id:"lagosreview",name:"The Lagos Review",website:"https://thelagosreview.ng",type:"Literary",status:"PITCHED",box:"OPEN",pitchDate:"",nudgeDays:35,closeDays:70,editorName:"",editorEmail:"submissions@thelagosreview.ng",
+       claim:"Loss & Grief essay — the grief of living: what chasing 'making it online' quietly cost me. Full submission, not a pitch.",
+       kit:"One honest personal essay, max 1,500 words. The quiet losses nobody sees — NOT the dramatic scenes already assigned to Byline/Vox.",
+       offLimits:"Gambling addiction specifics (Byline/Vox own them) · phone-coding scenes (Afrolicious owns them).",
+       wordCount:"max 1,500",pay:"$250/essay (paid 1 month after pub)",payMethod:"USD — Payoneer/Geegpay",
+       aiPolicy:"BANNED — 'AI produced essays will not be considered.' Every word must be yours.",
+       notes:"Rolling until 31 Dec 2026. Full essay by email. Top 12 published essays → book collection + one-off $500 royalty. No fiction.",
+       publishedLink:"",log:[]},
+      {id:"efiko",name:"Efiko Magazine",website:"https://efikomag.com/submission-guidelines/",type:"Literary",status:"PITCHED",box:"OPEN",pitchDate:"",nudgeDays:50,closeDays:70,editorName:"",editorEmail:"submissions@efikomag.com",
+       claim:"Best literary piece (Africa as place + perspective) — one strong submission per issue.",
+       kit:"Best existing story/essay, 1,200–5,000 words — 2,500+ published words = the higher pay band.",
+       offLimits:"Anything already published online · material assigned to other boxes.",
+       wordCount:"1,200–5,000 (prose)",pay:"₦30,000 (2,500+ words) / ₦20,000 under",payMethod:"Bank (naira)",
+       aiPolicy:"None stated — but strictly original, unpublished work (anything already online is rejected).",
+       notes:"Word doc · Times New Roman 12pt · double-spaced · numbered pages · genre in subject line · 5-line bio in body · ONE piece per issue · simultaneous OK (tell them if accepted elsewhere). They answer within 50 days — nudge after that.",
+       publishedLink:"",log:[]}
     ],
     opps:[
       {id:"medium",name:"Medium (Partner Program)",tier:1,pay:"Yes — earns from member reads (Nigeria eligible)",how:"Join MPP, publish 1 story, link Stripe",link:"https://medium.com",status:"not-started",notes:"Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."},
@@ -304,6 +340,10 @@ function seed(){
       {t:"2 new pitches every 2 weeks — next batch ~21 Aug",done:false},
       {t:"Deploy PitchLedger to GitHub Pages",done:false},
       {t:"WhatCulture: sign up + pitch 3 listicle ideas (locked in)",done:false},
+      {t:"4 Sep — Afrolicious pitch goes to editorial: final draft + 2 backup pitches READY",done:false},
+      {t:"Efiko: send best literary piece (2,500+ words = ₦30k) — submissions@efikomag.com",done:false},
+      {t:"Lagos Review: write the Loss & Grief essay (max 1,500w) — call closes 31 Dec",done:false},
+      {t:"Open Payoneer or Geegpay USD account (STATEMENT + Lagos Review pay dollars)",done:false},
       {t:"WondersList article sent — first paid submission ✅",done:true}
     ],
     drafts:[
@@ -316,7 +356,21 @@ function seed(){
 var state;
 function load(){
   var raw = sget("pitchledger_v2");
-  if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets){ if(!s.drafts) s.drafts=[]; return s; } }catch(e){} }
+  if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets){
+      if(!s.drafts) s.drafts=[];
+      /* v2.1 (28 Aug 2026): merge in BRYME-researched outlets + verified facts. Never touches your own records. */
+      if(!s.v21){
+        var ns=seed();
+        ns.outlets.forEach(function(si){ if(!s.outlets.some(function(x){ return x.id===si.id; })) s.outlets.push(si); });
+        var rep=s.outlets.find(function(x){ return x.id==="republic"; });
+        if(rep){ rep.pay="₦21k–₦150k by format (themed calls ₦200k–₦500k)";
+          if(!rep.log.some(function(l){ return /VERIFIED 28 Aug/.test(l.e); })) rep.log.push({d:"2026-08-28",e:"VERIFIED (BRYME research): pitch via FORMS at rpublc.com/submissions — NOT email. Analysis ₦36k · Essay ₦100k · Deep Dive ₦150k. Fiction closed. 5% WHT."}); }
+        ["afrolicious","whatculture"].forEach(function(id){ var o=s.outlets.find(function(x){ return x.id===id; }); if(o && !o.aiPolicy){ o.aiPolicy = id==="afrolicious" ? "None stated — write it yourself anyway." : "No AI in content creation — their stated policy."; } });
+        (ns.tasks||[]).forEach(function(t){ if(!s.tasks) s.tasks=[]; if(!s.tasks.some(function(x){ return x.t===t.t; })) s.tasks.push(t); });
+        s.v21=1; save(s);
+      }
+      return s;
+  } }catch(e){} }
   /* Migrate from v1 storage: keep user data, merge in new seed entries */
   var old = sget("pitchledger_v1");
   if(old){ try{
@@ -499,6 +553,7 @@ function outletCard(o){
   if(o.editorName||o.editorEmail) rows+='<div class="detrow"><span class="k">Editor</span><span class="v">'+esc(o.editorName||"—")+(o.editorEmail?'<br><span style="font-weight:500;font-size:12.5px;color:var(--dim)">'+esc(o.editorEmail)+'</span>':"")+'</span></div>';
   if(o.wordCount||o.pay) rows+='<div class="detrow"><span class="k">Length / pay</span><span class="v">'+esc(o.wordCount||"—")+(o.pay?" · "+esc(o.pay):"")+'</span></div>';
   if(o.payMethod) rows+='<div class="detrow"><span class="k">Payment method</span><span class="v">'+esc(o.payMethod)+'</span></div>';
+  if(o.aiPolicy) rows+='<div class="detrow"><span class="k">🤖 AI policy</span><span class="v">'+esc(o.aiPolicy)+'</span></div>';
   if(o.publishedLink) rows+='<div class="detrow"><span class="k">Published</span><span class="v"><a href="'+esc(o.publishedLink)+'" target="_blank" rel="noopener">link ↗</a></span></div>';
   h+=rows;
   h+='<div class="note"><b>💡 The idea:</b> '+esc(o.claim||"—")+'</div>';
@@ -620,6 +675,7 @@ function outletForm(o){
   h+='<div class="field"><label>Length</label><input id="f_words" value="'+f("wordCount")+'"></div>';
   h+='<div class="field"><label>Pay</label><input id="f_pay" value="'+f("pay")+'"></div>';
   h+='<div class="field"><label>Payment method</label><input id="f_method" value="'+f("payMethod")+'"></div>';
+  h+='<div class="field"><label>🤖 AI policy</label><input id="f_ai" value="'+f("aiPolicy")+'" placeholder="e.g. No AI-generated work accepted"><div class="hint">Checked and verified per outlet — editors test for this.</div></div>';
   h+='<div class="field"><label>Published link</label><input id="f_publink" value="'+f("publishedLink")+'"></div>';
   h+='<div class="field"><label>Notes</label><textarea id="f_notes">'+f("notes")+'</textarea></div>';
   h+='<div class="modal-actions"><button class="bbtn green" data-act="saveoutlet" data-id="'+f("id")+'">💾 Save</button><button class="bbtn gray" data-act="closemodal">Cancel</button></div>';
@@ -652,7 +708,7 @@ function saveOutlet(id){
   o.name=g("f_name")||"Untitled"; o.website=g("f_website"); o.status=g("f_status"); o.box=g("f_box");
   o.pitchDate=g("f_pitch"); o.nudgeDays=parseInt(g("f_nudge"),10)||21; o.closeDays=parseInt(g("f_close"),10)||42;
   o.editorName=g("f_editor"); o.editorEmail=g("f_email"); o.claim=g("f_claim"); o.kit=g("f_kit"); o.offLimits=g("f_off");
-  o.wordCount=g("f_words"); o.pay=g("f_pay"); o.payMethod=g("f_method"); o.publishedLink=g("f_publink"); o.notes=g("f_notes");
+  o.wordCount=g("f_words"); o.pay=g("f_pay"); o.payMethod=g("f_method"); o.aiPolicy=g("f_ai"); o.publishedLink=g("f_publink"); o.notes=g("f_notes");
   if(isNew) state.outlets.push(o);
   save(state); closeModal(); renderAll();
 }
@@ -730,6 +786,7 @@ function renderAll(){
 state=load();
 renderAll();
 setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
+document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderStats(); renderToday(); renderOutlets(); } });
 try{ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); } }catch(e){}
 </script>
 </body>
