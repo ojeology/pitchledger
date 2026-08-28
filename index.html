@@ -1,716 +1,521 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0e1116">
-<meta name="description" content="PitchLedger — your simple writing tracker. Pitches, reminders, drafts, and ideas.">
+<meta name="theme-color" content="#f7f3ea">
+<title>PitchLedger — a working journal</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1116'/%3E%3Ctext x='32' y='42' font-size='30' text-anchor='middle' fill='%2334d399' font-family='sans-serif' font-weight='bold'%3EPL%3C/text%3E%3C/svg%3E">
-<title>PitchLedger</title>
 <style>
-  :root{
-    --bg:#0e1116; --card:#171d28; --card2:#1f2634; --line:#2a3345;
-    --txt:#eef1f7; --dim:#9aa4b8; --accent:#34d399; --amber:#fbbf24; --red:#f87171;
-    --blue:#7aa8f7; --purple:#b39dfa; --ok:#34d399;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",sans-serif;font-size:16px;line-height:1.55}
-  body{padding-bottom:96px}
-  header{position:sticky;top:0;z-index:20;background:rgba(14,17,22,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px}
-  .brand{font-weight:800;font-size:20px;letter-spacing:.2px}
-  .brand .dot{color:var(--accent)}
-  #stats{display:flex;gap:8px;flex-wrap:wrap;padding:4px 16px 8px}
-  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12.5px;color:var(--dim)}
-  .chip b{color:var(--txt)}
-  .chip.warn{color:var(--red);border-color:var(--red)}
-  nav{display:flex;overflow-x:auto;gap:6px;padding:0 12px 10px;scrollbar-width:none}
-  nav::-webkit-scrollbar{display:none}
-  .tabbtn{flex:1;min-width:104px;border:1px solid transparent;background:transparent;color:var(--dim);padding:10px 6px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
-  .tabbtn.on{background:var(--card2);color:var(--accent);border-color:var(--line)}
-  main{max-width:640px;margin:0 auto;padding:14px 14px 0}
-  .tab{display:none}
-  .tab.on{display:block}
-  h2{font-size:18px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
-  h2 .count{font-size:13px;color:var(--dim);font-weight:600}
-  /* ---------- cards ---------- */
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-  .card.redbar{border-left:5px solid var(--red)}
-  .card.amberbar{border-left:5px solid var(--amber)}
-  .card.greenbar{border-left:5px solid var(--accent)}
-  .card.bluebar{border-left:5px solid var(--blue)}
-  .card.graybar{border-left:5px solid var(--dim)}
-  .cardrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .cardtitle{font-weight:800;font-size:17px}
-  .cardtitle a{color:var(--txt);text-decoration:none}
-  .cardtitle .tiny{font-size:12px;color:var(--dim);font-weight:500}
-  .pill{display:inline-block;font-size:12px;font-weight:800;padding:4px 12px;border-radius:999px;white-space:nowrap}
-  .pill-PITCHED{background:#1d2c44;color:var(--blue)}
-  .pill-NUDGED1,.pill-NUDGED2{background:#33291a;color:var(--amber)}
-  .pill-YES{background:#10301f;color:var(--accent)}
-  .pill-NO,.pill-CLOSED{background:#331a1a;color:var(--red)}
-  .pill-PUBLISHED{background:#221d44;color:var(--purple)}
-  .pill-PAID{background:#113324;color:#4ade80}
-  .pill-PAUSED{background:#262b38;color:var(--dim)}
-  .cd{margin:12px 0 6px}
-  .cd .num{font-size:34px;font-weight:800;line-height:1.1}
-  .cd .num.red{color:var(--red)} .cd .num.amber{color:var(--amber)} .cd .num.green{color:var(--accent)} .cd .num.dim{color:var(--dim)}
-  .cd .lbl{font-size:14px;color:var(--dim);display:block}
-  .cd .sub{font-size:12.5px;color:var(--dim)}
-  .bigbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .bbtn{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:12px;padding:12px 10px;font-size:14.5px;font-weight:700;cursor:pointer;text-align:center}
-  .bbtn:hover{filter:brightness(1.15)}
-  .bbtn.green{background:#10301f;border-color:#14532d;color:var(--accent)}
-  .bbtn.red{background:#331a1a;border-color:#7f1d1d;color:var(--red)}
-  .bbtn.amber{background:#33291a;border-color:#713f12;color:var(--amber)}
-  .bbtn.blue{background:#1d2c44;border-color:#1e3a5f;color:var(--blue)}
-  .bbtn.gray{color:var(--dim)}
-  .bbtn:disabled{opacity:.45;cursor:default}
-  details{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
-  summary{cursor:pointer;font-size:14px;color:var(--dim);font-weight:700;user-select:none;list-style:none;display:flex;align-items:center;gap:6px}
-  summary::-webkit-details-marker{display:none}
-  summary .arrow{transition:transform .2s;display:inline-block}
-  details[open] summary .arrow{transform:rotate(90deg)}
-  .det{margin-top:10px}
-  .detrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(42,51,69,.5);font-size:14px}
-  .detrow:last-child{border-bottom:none}
-  .detrow .k{color:var(--dim)}
-  .detrow .v{color:var(--txt);text-align:right;font-weight:600}
-  .detrow .v a{color:var(--blue);text-decoration:none}
-  .note{background:var(--card2);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:10px;white-space:pre-wrap;color:var(--txt)}
-  .note b{color:var(--accent)}
-  .log{margin-top:10px;font-size:13px;color:var(--dim)}
-  .log div{margin-bottom:4px}
-  .log .d{color:var(--accent);font-weight:700;margin-right:6px}
-  .mini{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;font-size:14.5px}
-  .mini .mname{font-weight:700}
-  .mini .mcd{color:var(--dim);white-space:nowrap}
-  .mini .mcd.red{color:var(--red);font-weight:700}
-  .mini .mcd.amber{color:var(--amber);font-weight:700}
-  /* ---------- welcome ---------- */
-  .welcome{background:linear-gradient(135deg,#10301f 0%,#0e1b2c 60%,#171d28 100%);border:1px solid var(--accent);border-radius:18px;padding:20px;margin-bottom:16px}
-  .welcome h3{font-size:20px;margin-bottom:8px}
-  .welcome p{font-size:14.5px;color:var(--dim);margin-bottom:6px}
-  .welcome b{color:var(--txt)}
-  .welcome .okbtn{display:block;width:100%;margin-top:12px;background:var(--accent);color:#06281a;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer}
-  /* ---------- tasks ---------- */
-  .task{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;border-bottom:1px dashed var(--line);font-size:14.5px}
-  .task input{margin-top:4px;width:18px;height:18px;accent-color:var(--accent)}
-  .task.done{color:var(--dim);text-decoration:line-through}
-  /* ---------- opportunities ---------- */
-  .opp{padding:14px 16px}
-  .opp .opname{font-weight:800;font-size:15.5px}
-  .opp .opay{color:var(--accent);font-size:13.5px;font-weight:700;margin-top:2px}
-  .opp select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 9px;font-size:13.5px}
-  .tier{font-size:12px;font-weight:800;letter-spacing:.8px;color:var(--dim);margin:18px 0 8px;text-transform:uppercase}
-  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .fchip{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
-  .fchip.on{background:var(--card2);color:var(--accent);border-color:var(--accent)}
-  .search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:11px 14px;font-size:15px;margin-bottom:12px}
-  .search::placeholder{color:var(--dim)}
-  .empty{color:var(--dim);font-size:14px;text-align:center;padding:26px 8px}
-  /* ---------- drafts ---------- */
-  #d_text{width:100%;min-height:52vh;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:14px;font-size:16px;font-family:inherit;line-height:1.6;resize:vertical}
-  .inline-input{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:8px 10px;font-size:14.5px;max-width:100%}
-  /* ---------- settings ---------- */
-  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
-  .stat .n{font-size:26px;font-weight:800;color:var(--accent)}
-  .stat .t{font-size:12.5px;color:var(--dim)}
-  .field{margin-bottom:12px}
-  .field label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px;font-weight:700}
-  .field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14.5px;font-family:inherit}
-  .field textarea{min-height:64px;resize:vertical}
-  .field input[type=date]{color-scheme:dark}
-  .hint{font-size:12.5px;color:var(--dim);margin-top:4px}
-  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;overflow-y:auto;padding:20px 14px}
-  #modal.on{display:block}
-  .modal-box{background:var(--card);border:1px solid var(--line);border-radius:18px;max-width:560px;margin:16px auto;padding:18px}
-  .modal-box h3{margin-bottom:14px;font-size:18px}
-  .modal-actions{display:flex;gap:10px;margin-top:16px}
-  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--accent);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:opacity .4s;max-width:90vw;text-align:center}
-  .toast.out{opacity:0}
-  .footer{color:var(--dim);font-size:12px;text-align:center;padding:22px 0 30px}
+:root{
+  --paper:#f7f3ea; --card:#fffdf7; --ink:#221c13; --dim:#847a68; --faint:#a89d87;
+  --rule:#d9cfba; --hair:#e6ddc9; --accent:#8a2f2b; --green:#2e5d4b; --gold:#96742a;
+  --amber:#9a6b1f; --blue:#2f4d6b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 Georgia,"Times New Roman",serif;
+  padding:18px 16px 90px;max-width:860px;margin:0 auto}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:var(--accent)}
+.micro{font:600 10.5px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:3px double var(--ink);padding-bottom:14px;margin-bottom:14px}
+.mast-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand{font-size:26px;font-weight:700;letter-spacing:.32em;text-transform:uppercase}
+.brand span{color:var(--accent)}
+.todaydate{font-style:italic;color:var(--dim);font-size:14.5px}
+.tagline{font-style:italic;color:var(--dim);margin-top:4px;font-size:14.5px}
+
+/* ---------- nav ---------- */
+.nav{display:flex;gap:2px 22px;flex-wrap:wrap;border-bottom:1px solid var(--rule);
+  padding-bottom:0;margin-bottom:22px}
+.nav button{font:600 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  padding:10px 2px 9px;border-bottom:2px solid transparent}
+.nav button.on{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* ---------- section heads ---------- */
+.shead{display:flex;align-items:center;gap:12px;margin:26px 0 10px}
+.shead .micro{color:var(--ink);white-space:nowrap}
+.shead:after{content:"";flex:1;border-top:1px solid var(--rule)}
+.shead .cnt{font-style:italic;color:var(--faint);font-size:13px}
+
+/* ---------- stat row ---------- */
+.stats{display:flex;flex-wrap:wrap;border:1px solid var(--rule);background:var(--card)}
+.stat{flex:1 1 110px;padding:12px 14px;border-right:1px solid var(--hair);text-align:left}
+.stat:last-child{border-right:none}
+.stat b{display:block;font-size:26px;line-height:1.15}
+.stat span{display:block;margin-top:2px}
+
+/* ---------- journal entries (ledger) ---------- */
+.entry{display:grid;grid-template-columns:86px 1fr 96px;gap:4px 14px;padding:15px 4px;
+  border-bottom:1px solid var(--hair);align-items:start}
+.entry:hover{background:var(--card)}
+.e-date{font-size:12.5px;color:var(--dim);font-style:italic;padding-top:4px}
+.e-date b{display:block;font-style:normal;font-size:14px;color:var(--ink)}
+.e-name{font-size:19px;line-height:1.25}
+.e-name a{text-decoration:none;color:inherit}
+.e-name a:hover{color:var(--accent)}
+.e-claim{font-style:italic;color:var(--dim);font-size:14px;margin-top:3px}
+.e-meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.e-meta .micro{color:var(--faint)}
+.stamp{justify-self:end;display:inline-block;transform:rotate(-2.5deg);margin-top:4px;
+  border:2px solid currentColor;border-radius:3px;padding:3px 7px;
+  font:700 9.5px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.12em;text-transform:uppercase;text-align:center}
+.st-PITCHED{color:var(--blue)} .st-NUDGED1,.st-NUDGED2{color:var(--amber)}
+.st-YES{color:var(--green)} .st-PUBLISHED{color:var(--gold)} .st-PAID{color:var(--green)}
+.st-NO,.st-CLOSED{color:var(--faint)} .st-PAUSED{color:var(--dim)}
+.daycount{justify-self:end;text-align:right;margin-top:2px}
+.daycount b{font-size:21px}
+.daycount span{display:block}
+
+/* ---------- details / log ---------- */
+details{margin-top:8px}
+summary{list-style:none;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary .micro:hover{color:var(--accent)}
+.det{background:var(--card);border:1px solid var(--hair);padding:12px 14px;margin-top:8px}
+.detrow{display:flex;gap:12px;padding:5px 0;border-bottom:1px dotted var(--hair);font-size:14px}
+.detrow:last-child{border-bottom:none}
+.detrow .k{flex:0 0 118px}
+.detrow .v{flex:1}
+.log{margin-top:8px}
+.logentry{padding:6px 0;border-bottom:1px dotted var(--hair);font-size:13.5px}
+.logentry i{color:var(--faint);margin-right:8px}
+.bigbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+
+/* ---------- buttons ---------- */
+.bbtn{font:600 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.12em;
+  text-transform:uppercase;border:1px solid var(--ink);padding:9px 13px;background:var(--card);color:var(--ink)}
+.bbtn:hover{background:var(--ink);color:var(--paper)}
+.bbtn.green{background:var(--green);border-color:var(--green);color:#fdfbf5}
+.bbtn.green:hover{background:#24493b}
+.bbtn.gray{border-color:var(--rule);color:var(--dim)}
+.bbtn.red{border-color:var(--accent);color:var(--accent)}
+.bbtn.red:hover{background:var(--accent);color:var(--paper)}
+.fab{position:fixed;right:18px;bottom:18px;background:var(--ink);color:var(--paper);
+  font:600 11.5px/1 -apple-system,sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  padding:15px 18px;border-radius:999px;box-shadow:0 6px 18px rgba(34,28,19,.35);z-index:30}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.fchip{font:600 10.5px/1 -apple-system,sans-serif;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--rule);color:var(--dim);padding:7px 10px;border-radius:999px;background:var(--card)}
+.fchip.on{border-color:var(--ink);color:var(--paper);background:var(--ink)}
+
+/* ---------- today blocks ---------- */
+.need{display:flex;gap:12px;align-items:baseline;padding:11px 2px;border-bottom:1px solid var(--hair)}
+.need .n-act{flex:0 0 150px}
+.need .n-what{flex:1;font-size:15px}
+.need .n-day{font-style:italic;color:var(--accent);white-space:nowrap;font-size:13.5px}
+.empty{font-style:italic;color:var(--faint);padding:14px 2px;font-size:14.5px}
+
+/* ---------- boxes / opps ---------- */
+.boxcard{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--gold);
+  padding:14px 16px;margin-bottom:12px}
+.boxcard.sealed{border-top-color:var(--accent)}
+.boxcard.paused{border-top-color:var(--faint)}
+.boxcard.openb{border-top-color:var(--green)}
+.boxcard h3{font-size:18px;margin-bottom:2px}
+.boxkit{margin-top:8px}
+.boxkit li{margin-left:18px;font-size:14px;padding:2px 0}
+.opp{display:flex;gap:12px;padding:11px 2px;border-bottom:1px solid var(--hair);align-items:baseline}
+.opp .o-tier{flex:0 0 34px;font-size:20px;color:var(--faint);font-style:italic}
+.opp .o-body{flex:1}
+.opp .o-name{font-size:16.5px}
+.opp .o-pay{font-style:italic;color:var(--green);font-size:14px}
+.opp .o-note{font-size:13.5px;color:var(--dim);margin-top:2px}
+
+/* ---------- drafts ---------- */
+.draftrow{display:flex;justify-content:space-between;gap:10px;padding:11px 2px;
+  border-bottom:1px solid var(--hair);align-items:baseline;cursor:pointer}
+.draftrow:hover{background:var(--card)}
+.draftrow .d-title{font-size:16px}
+.draftrow .d-meta{font-size:12.5px;color:var(--faint);font-style:italic;white-space:nowrap}
+.darea{width:100%;min-height:340px;border:1px solid var(--rule);background:var(--card);
+  padding:14px;font:15px/1.7 Georgia,serif;color:var(--ink);resize:vertical}
+.darea:focus{outline:none;border-color:var(--ink)}
+.wc{text-align:right;font-style:italic;color:var(--faint);font-size:12.5px;margin-top:4px}
+
+/* ---------- tasks ---------- */
+.task{display:flex;gap:10px;padding:8px 2px;border-bottom:1px solid var(--hair);align-items:baseline}
+.task input{appearance:none;width:15px;height:15px;border:1.5px solid var(--dim);flex:0 0 15px;position:relative;top:2px}
+.task input:checked{background:var(--green);border-color:var(--green)}
+.task span{font-size:15px}
+.task.done span{text-decoration:line-through;color:var(--faint)}
+
+/* ---------- modal / toast ---------- */
+.modal{position:fixed;inset:0;background:rgba(34,28,19,.55);display:none;z-index:40;
+  padding:20px 14px;overflow:auto}
+.modal.on{display:block}
+.modal-box{background:var(--paper);border:1px solid var(--ink);max-width:620px;margin:20px auto;
+  padding:22px 22px 18px;box-shadow:0 14px 44px rgba(0,0,0,.3)}
+.modal-box h3{font-size:21px;margin-bottom:14px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.field{margin-bottom:12px}
+.field label{display:block;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;background:transparent;color:var(--ink);
+  border:none;border-bottom:1px solid var(--rule);padding:6px 2px;font:15px Georgia,serif}
+.field textarea{min-height:64px;resize:vertical;line-height:1.5}
+.field input:focus,.field select,.field textarea:focus{outline:none;border-bottom-color:var(--ink)}
+.hint{font-size:12px;color:var(--faint);font-style:italic;margin-top:3px}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--paper);padding:11px 18px;font:14px Georgia,serif;
+  transition:transform .25s;z-index:50;max-width:88vw;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  .entry{grid-template-columns:1fr}
+  .e-date{order:3;padding-top:0}
+  .stamp{justify-self:start;order:2;margin-top:6px}
+  .daycount{text-align:left;justify-self:start;order:1;margin-top:6px;display:inline-block}
+  .daycount b{font-size:17px}
+  .stat b{font-size:21px}
+  .brand{font-size:20px;letter-spacing:.22em}
+  .need{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
-<header>
-  <div class="topbar">
-    <div class="brand"><span id="appName">PitchLedger</span><span class="dot">.</span></div>
+<header class="mast">
+  <div class="mast-row">
+    <div class="brand" id="brandName">PITCH<span>LEDGER</span></div>
+    <div class="todaydate" id="todayDate"></div>
   </div>
-  <div id="stats"></div>
-  <nav id="tabs">
-    <button class="tabbtn on" data-tab="today">📌 Today</button>
-    <button class="tabbtn" data-tab="outlets">📤 My Pitches</button>
-    <button class="tabbtn" data-tab="drafts">📝 Drafts</button>
-    <button class="tabbtn" data-tab="opps">💡 Ideas</button>
-    <button class="tabbtn" data-tab="settings">⚙️ Settings</button>
-  </nav>
+  <p class="tagline">A working journal of pitches sent, answers waited on, and money earned.</p>
 </header>
-<main>
-  <section id="tab-today" class="tab on"></section>
-  <section id="tab-outlets" class="tab"></section>
-  <section id="tab-drafts" class="tab"></section>
-  <section id="tab-opps" class="tab"></section>
-  <section id="tab-settings" class="tab"></section>
-</main>
-<div id="modal"></div>
-<div class="footer">PitchLedger v2.4 · made simple for Sodiq · data stays on your phone · back up in Settings</div>
+<nav class="nav" id="nav"></nav>
+<main id="view"></main>
+<button class="fab" data-nav="ledger" data-new="1">＋ New pitch</button>
+<div class="modal" id="modal"></div>
+<div class="toast" id="toast"></div>
+
 <script>
-"use strict";
-/* ================= STORAGE ================= */
-var mem = {};
+/* ================= DATA LAYER (same storage as always — your data is safe) ================= */
+var SEED={"v21": 1, "appName": "PitchLedger", "outlets": [{"id": "afrolicious", "name": "Afrolicious", "website": "https://afrolicious.com", "type": "Magazine", "status": "YES", "box": "OPEN", "pitchDate": "2026-08-04", "nudgeDays": 31, "closeDays": 45, "editorName": "Ann Daramola", "editorEmail": "", "claim": "AI is giving young Africans without traditional tech access a genuine path into software.", "kit": "Door scenes: the decision to learn, first successful build, Fortebet Learning as proof, laughed-at → earned respect.", "offLimits": "NumPy battle · power cuts · 'shortcuts' · the bridge · betting shop interior", "wordCount": "1,000–1,500", "pay": "TBD", "payMethod": "", "notes": "Ann said YES (4 Aug): 'very intrigued… would love to publish it… restructuring… reach back out in one month.' Draft ready by 1 Sep. Don't reuse the phone-setup opening or Republic's ending.", "aiPolicy": "None stated — write it yourself anyway.", "publishedLink": "", "log": [{"d": "2026-08-04", "e": "Ann: very intrigued, wants to publish after restructuring, will follow up in ~1 month."}, {"d": "2026-08-07", "e": "Replied 'Looking forward to it!'"}]}, {"id": "row", "name": "Rest of World", "website": "https://restofworld.org", "type": "Magazine", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 28, "closeDays": 56, "editorName": "", "editorEmail": "", "claim": "What it actually feels like to build serious software on an Android phone in Nigeria.", "kit": "NumPy install battle · power cuts · data costs · GitHub · the phone as a development machine.", "offLimits": "'Access/opportunity' moralizing · AI education thesis · the bridge", "wordCount": "800–1,000 (Ideas)", "pay": "~$1/word", "payMethod": "Bank", "notes": "Reminder at 3–4 weeks after pitch date. The machine, not the door.", "publishedLink": "", "log": []}, {"id": "noema", "name": "Noema", "website": "https://noemamag.com", "type": "Magazine", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 30, "closeDays": 60, "editorName": "", "editorEmail": "", "claim": "AI is becoming educational infrastructure, compressing years of learning into months — not replacing effort, but changing how expertise is built.", "kit": "Libraries vs AI · self-directed learning · global examples (Kenya, India, Brazil) · credentialing argument.", "offLimits": "Nigerian phone-coding texture · personal route into software · 'shortcuts'", "wordCount": "essay", "pay": "~$3,000", "payMethod": "Bank", "notes": "Replies within ~1 month if accepted. If silent past 6 weeks → re-tool for Aeon.", "publishedLink": "", "log": []}, {"id": "republic", "name": "The Republic", "website": "https://republic.com.ng", "type": "Journal", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 21, "closeDays": 42, "editorName": "", "editorEmail": "editors@republic.com.ng", "claim": "AI is changing what ambition looks like for young Nigerians.", "kit": "Nigerian context · youth · coding culture · self-learning · REPORTING needed (interviews, Lagos fieldwork).", "offLimits": "'AI + effort = opportunity' ending (Afrolicious owns access) · infrastructure thesis", "wordCount": "1,500–3,500", "pay": "₦21k–₦150k by format (themed calls ₦200k–₦500k)", "payMethod": "Bank (naira)", "notes": "VERIFIED 28 Aug: pitch via the FORMS at rpublc.com/submissions — NOT email. Rates: Analysis ₦36k · Personal Essay ₦100k · Deep Dive/Reportage ₦150k · themed calls ₦200k–₦500k. Fiction CLOSED. 5% withholding tax. Needs reporting, not just memoir.", "aiPolicy": "None stated — original reporting required.", "publishedLink": "", "log": []}, {"id": "incomedaily", "name": "Income Daily", "website": "", "type": "Newsletter", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 14, "closeDays": 28, "editorName": "", "editorEmail": "", "claim": "The internet sold me wealth; programming taught me value.", "kit": "Trading bots · online schemes · skill-building · work vs hype · becoming a center manager.", "offLimits": "The word 'shortcuts' (Byline owns it) · gambling addiction psychology", "wordCount": "", "pay": "TBD", "payMethod": "", "notes": "Fast outlet. Reminder at 2 weeks. End on value/work, not 'shortcuts'.", "publishedLink": "", "log": []}, {"id": "byline", "name": "Byline", "website": "", "type": "Platform", "status": "PAUSED", "box": "PAUSED", "pitchDate": "", "nudgeDays": 14, "closeDays": 28, "editorName": "", "editorEmail": "", "claim": "The real addiction wasn't gambling — it was shortcuts.", "kit": "Sleeping under the bridge (opening) · ₦98k win · ₦500k loss · recovery through programming.", "offLimits": "Betting shop interior · family break (Vox) · access/opportunity (Afrolicious)", "wordCount": "", "pay": "", "payMethod": "", "notes": "PAUSED by choice — Afrolicious is priority. Material reserved; can be opened any time.", "publishedLink": "", "log": []}, {"id": "vox", "name": "Vox (First Person)", "website": "https://vox.com", "type": "Magazine", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 21, "closeDays": 42, "editorName": "", "editorEmail": "", "claim": "Gambling addiction isn't just about money — it changes how you think and how hard it is to rebuild.", "kit": "Betting shop interior · the family break · cognitive damage · rebuild as a social story · Fortebet job setting.", "offLimits": "The bridge scene · 'shortcuts' thesis · ₦98k/₦500k numbers (Byline)", "wordCount": "800–1,500", "pay": "$400–500", "payMethod": "Bank", "notes": "Needs a 'why now' hook. Vox may ask for a full draft within days.", "publishedLink": "", "log": []}, {"id": "whatculture", "name": "WhatCulture", "website": "https://whatculture.com/write-for-us", "type": "Listicle", "status": "PITCHED", "box": "OPEN", "pitchDate": "2026-08-08", "nudgeDays": 14, "closeDays": 28, "editorName": "Editorial team", "editorEmail": "", "claim": "£40 per list article (film/TV/gaming/music/comics), PayPal, no experience needed, unlimited articles.", "kit": "Listicles only — entertainment topics, 1,500+ words, 100% original, pitched through their dashboard.", "offLimits": "Essay material (Afrolicious, Byline, Vox scenes) stays out of listicles. No republishing sold articles.", "wordCount": "1,500+", "pay": "£40/article (~$50) + revenue share", "payMethod": "PayPal", "notes": "LOCKED IN. Signed up 8 Aug. Pitch 3 list ideas this week. Approved articles paid at start of next month. No AI in content creation (check policy).", "aiPolicy": "No AI in content creation — their stated policy.", "publishedLink": "", "log": [{"d": "2026-08-08", "e": "Locked in — decided to commit. Sign up + pitch list ideas this week."}]}, {"id": "wonderslist", "name": "WondersList", "website": "https://www.wonderslist.com/write-us/", "type": "Listicle", "status": "PITCHED", "box": "OPEN", "pitchDate": "2026-08-08", "nudgeDays": 7, "closeDays": 21, "editorName": "WondersList team", "editorEmail": "admin@wonderslist.com", "claim": "Top 10 Most Unbelievable Sports Moments of All Time — first paid article ($5).", "kit": "Sports listicle: 10 items ranked #10→#1, 1,500+ words, every fact verified with source links.", "offLimits": "They own the article forever after publication — never republish it anywhere.", "wordCount": "1,511", "pay": "$5", "payMethod": "PayPal (sodiqibrahim30@gmail.com)", "notes": "SENT 8 Aug 2026. Their page: reply ~48h for queries, acceptance a few days, $5 lands within 1–2 weeks. If silent after 7 days, one gentle follow-up, then close at 21 days.", "publishedLink": "", "log": [{"d": "2026-08-08", "e": "Article sent to admin@wonderslist.com — FIRST PAID SUBMISSION 🎯"}]}, {"id": "communique", "name": "Communiqué", "website": "https://www.readcommunique.com/p/pitch-communique", "type": "Substack", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 21, "closeDays": 42, "editorName": "David I. Adeleke (editor)", "editorEmail": "", "claim": "How Telegram mini-apps became Nigeria's new entertainment channel — reported from inside one.", "kit": "BRYME data: group growth, ad economics, locked-content model · Telegram mini-app trend across Africa · creator economy numbers.", "offLimits": "Personal essay material (Afrolicious owns it) — pitch as reported analysis, not memoir.", "wordCount": "1,000–1,500", "pay": "₦150,000/story ($100 outside NG)", "payMethod": "Bank (naira)", "aiPolicy": "None stated — rigorously reported original work expected.", "notes": "MUST be subscribed (free) first, then submit via the Google Form on their pitch page. Data-driven + a hook. 40k+ audience. Rolling deadline.", "publishedLink": "", "log": []}, {"id": "statement", "name": "STATEMENT Africa", "website": "https://statementafrica.com", "type": "Magazine", "status": "PITCHED", "box": "SEALED", "pitchDate": "", "nudgeDays": 28, "closeDays": 56, "editorName": "Chisom Peter Job (Managing Editor)", "editorEmail": "chisom@statementafrica.com", "claim": "Anime and K-drama demand in Nigeria: the streaming gap young Nigerians are bridging with Telegram.", "kit": "BRYME entertainment desk data (what readers actually open) · streaming prices in ₦ · the watchlist economy.", "offLimits": "Trading/psychology material · personal essay scenes.", "wordCount": "~1,500 (negotiated)", "pay": "$0.20–$1.00/word (up to ~$1,500)", "payMethod": "USD — Payoneer/Geegpay (open one!)", "aiPolicy": "None stated — fresh angles, original work only.", "notes": "Email subject: 'PITCH — [headline]' (+ 'Timely' if time-sensitive). MAX 2 pitches per email, then WAIT for reply. Data-backed features favoured; they help build datasets.", "publishedLink": "", "log": []}, {"id": "lagosreview", "name": "The Lagos Review", "website": "https://thelagosreview.ng", "type": "Literary", "status": "PITCHED", "box": "OPEN", "pitchDate": "", "nudgeDays": 35, "closeDays": 70, "editorName": "", "editorEmail": "submissions@thelagosreview.ng", "claim": "Loss & Grief essay — the grief of living: what chasing 'making it online' quietly cost me. Full submission, not a pitch.", "kit": "One honest personal essay, max 1,500 words. The quiet losses nobody sees — NOT the dramatic scenes already assigned to Byline/Vox.", "offLimits": "Gambling addiction specifics (Byline/Vox own them) · phone-coding scenes (Afrolicious owns them).", "wordCount": "max 1,500", "pay": "$250/essay (paid 1 month after pub)", "payMethod": "USD — Payoneer/Geegpay", "aiPolicy": "BANNED — 'AI produced essays will not be considered.' Every word must be yours.", "notes": "Rolling until 31 Dec 2026. Full essay by email. Top 12 published essays → book collection + one-off $500 royalty. No fiction.", "publishedLink": "", "log": []}, {"id": "efiko", "name": "Efiko Magazine", "website": "https://efikomag.com/submission-guidelines/", "type": "Literary", "status": "PITCHED", "box": "OPEN", "pitchDate": "", "nudgeDays": 50, "closeDays": 70, "editorName": "", "editorEmail": "submissions@efikomag.com", "claim": "Best literary piece (Africa as place + perspective) — one strong submission per issue.", "kit": "Best existing story/essay, 1,200–5,000 words — 2,500+ published words = the higher pay band.", "offLimits": "Anything already published online · material assigned to other boxes.", "wordCount": "1,200–5,000 (prose)", "pay": "₦30,000 (2,500+ words) / ₦20,000 under", "payMethod": "Bank (naira)", "aiPolicy": "None stated — but strictly original, unpublished work (anything already online is rejected).", "notes": "Word doc · Times New Roman 12pt · double-spaced · numbered pages · genre in subject line · 5-line bio in body · ONE piece per issue · simultaneous OK (tell them if accepted elsewhere). They answer within 50 days — nudge after that.", "publishedLink": "", "log": []}], "opps": [{"id": "medium", "name": "Medium (Partner Program)", "tier": 1, "pay": "Yes — earns from member reads (Nigeria eligible)", "how": "Join MPP, publish 1 story, link Stripe", "link": "https://medium.com", "status": "not-started", "notes": "Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."}, {"id": "devto", "name": "DEV.to", "tier": 1, "pay": "No — exposure/portfolio", "how": "Free account, instant publish", "link": "https://dev.to", "status": "not-started", "notes": "freeCodeCamp recommends new writers start here for samples."}, {"id": "hackernoon", "name": "HackerNoon", "tier": 1, "pay": "Contests up to $2,000 (USDT)", "how": "Submit story, editor review, contests", "link": "https://hackernoon.com", "status": "not-started", "notes": "Crypto-friendly payments work from Nigeria."}, {"id": "techcabal", "name": "TechCabal", "tier": 2, "pay": "$175 / 1,000–1,200 words", "how": "300–400-word pitch → kay@bigcabal.com", "link": "https://techcabal.com/come-write-for-us/", "status": "not-started", "notes": "Needs 2–3 samples — get them from Medium/DEV first."}, {"id": "zikoko", "name": "Zikoko (Big Cabal)", "tier": 2, "pay": "Pays contributors (amount at acceptance)", "how": "Pitch via submission form; ruth@bigcabal.com", "link": "https://www.zikoko.com/announcements/how-to-write-for-zikoko-a-contributor-guide/", "status": "not-started", "notes": "Open call for Nigerian creators worldwide. Gambling/recovery + hustle culture fit."}, {"id": "africanargs", "name": "African Arguments", "tier": 2, "pay": "Pays African journalists; fellowship ~$250/article", "how": "Submit via write-for-us page; fellowship application", "link": "https://africanarguments.org/write-for-us/", "status": "not-started", "notes": "PRIORITISES African writers based in Africa. Apply to the fellowship."}, {"id": "techpoint", "name": "Techpoint Africa", "tier": 2, "pay": "No pay mentioned — exposure", "how": "Full submission ~1,000 words → editor@techpoint.africa", "link": "https://techpoint.africa/pitch-us/", "status": "not-started", "notes": "⚠️ Rejects AI-GENERATED content. 30-day exclusivity."}, {"id": "fcc", "name": "freeCodeCamp News", "tier": 2, "pay": "No pay — huge audience + editing help", "how": "Apply via style-guide form (needs 3 samples)", "link": "https://www.freecodecamp.org/news/how-to-write-for-freecodecamp/", "status": "not-started", "notes": "Build 3 samples on DEV.to first. Small approval % — retry."}, {"id": "omenana", "name": "Omenana (African spec-fic)", "tier": 2, "pay": "$20/story", "how": "Submit in open windows (check omenana.com)", "link": "https://omenana.com/omenana-submissions/", "status": "not-started", "notes": "Wants African speculative fiction — your fantasy edge."}, {"id": "fiyah", "name": "FIYAH (Black spec-fic)", "tier": 2, "pay": "8¢/word", "how": "Submit in themed windows", "link": "https://fiyahlitmag.com", "status": "not-started", "notes": "Black speculative fiction by Black writers — you qualify."}, {"id": "simfiction", "name": "SimFiction Review", "tier": 2, "pay": "10¢/word up to $250 (first-timers)", "how": "Online portal, .RTF/.DOCX, disclose AI in cover letter", "link": "https://simfictionreview.com/submissions/", "status": "not-started", "notes": "Actively welcomes AI use + first-time authors. Tech/AI/simulation themes."}, {"id": "kdp", "name": "Amazon KDP (self-publish)", "tier": 2, "pay": "70% royalties", "how": "Upload book; AI-generated needs private disclosure", "link": "https://kdp.amazon.com", "status": "not-started", "notes": "Fantasy sells best. Payoneer → naira."}, {"id": "okadabooks", "name": "OkadaBooks (Nigerian)", "tier": 2, "pay": "70% royalties, naira bank transfer", "how": "Upload your book, sell to Nigerian readers", "link": "https://okadabooks.com", "status": "not-started", "notes": "Readers pay via airtime. Instant Nigerian presence."}, {"id": "clarkesworld", "name": "Clarkesworld", "tier": 3, "pay": "14¢/word", "how": "Online tracker only; no simultaneous subs; no AI", "link": "https://clarkesworldmagazine.com/submissions/", "status": "watchlist", "notes": "~1% acceptance. Read 10 stories first. Nigerian voices winning."}, {"id": "commonwealth", "name": "Commonwealth Short Story Prize", "tier": 3, "pay": "£5,000 overall / £2,500 regional", "how": "Free entry ~1 Nov; 2,000–5,000 words; fantasy OK", "link": "https://commonwealthfoundation.com", "status": "watchlist", "notes": "Nigeria eligible. Winners published in Granta."}, {"id": "textbroker", "name": "Textbroker", "tier": 1, "pay": "$0.01–0.09/word, weekly PayPal", "how": "Sign up, pass quality test, pick orders", "link": "https://www.textbroker.com", "status": "not-started", "notes": "Open internationally. Low pay but instant work + reviews. Content mill."}, {"id": "problogger", "name": "ProBlogger Job Board", "tier": 1, "pay": "Varies ($50–500+/job)", "how": "Free job board — browse listings, apply with samples", "link": "https://problogger.com/jobs", "status": "not-started", "notes": "Best board for remote content gigs; check each ad's international policy."}, {"id": "konnectng", "name": "Konnect Ng", "tier": 1, "pay": "Naira weekly", "how": "Sign up, write articles + surveys", "link": "https://konnectng.com", "status": "not-started", "notes": "Nigerian platform, PayPal/bank, weekly. Beginners + students."}, {"id": "constantcontent", "name": "Constant Content", "tier": 2, "pay": "$5–100+/article (you set price)", "how": "Submit articles to marketplace, clients buy", "link": "https://www.constant-content.com", "status": "not-started", "notes": "You keep rights until sold; set your own price."}, {"id": "verblio", "name": "Verblio", "tier": 2, "pay": "$15–80/post", "how": "Apply, then claim assignments", "link": "https://verblio.com", "status": "not-started", "notes": "Steady blog work; quality-based."}, {"id": "writeraccess", "name": "WriterAccess", "tier": 2, "pay": "$0.10–0.30/word", "how": "Apply + niche test", "link": "https://www.writeraccess.com", "status": "not-started", "notes": "Badges raise your rate; monthly payouts."}, {"id": "contra", "name": "Contra", "tier": 2, "pay": "You set rate — 0% commission", "how": "Create portfolio, apply to gigs", "link": "https://contra.com", "status": "not-started", "notes": "Keep 100% of earnings. Needs samples."}, {"id": "moneypantry", "name": "MoneyPantry", "tier": 2, "pay": "$50–300/article", "how": "Pitch personal finance articles", "link": "https://moneypantry.com/write-for-us", "status": "not-started", "notes": "Finance niche — your hustle/money story fits."}, {"id": "mentalfloss", "name": "Mental Floss", "tier": 2, "pay": "$150+", "how": "Pitch interesting facts/trivia", "link": "https://www.mentalfloss.com", "status": "not-started", "notes": "Verify international eligibility before pitching."}, {"id": "inkitt", "name": "Inkitt", "tier": 2, "pay": "Contests + contracts", "how": "Upload novel, enter contests", "link": "https://www.inkitt.com", "status": "not-started", "notes": "Free fiction platform with writing contests + book contracts."}, {"id": "hubpages", "name": "HubPages", "tier": 2, "pay": "Ad revenue share", "how": "Publish evergreen articles", "link": "https://hubpages.com", "status": "not-started", "notes": "Passive income, PayPal monthly."}, {"id": "aeon", "name": "Aeon", "tier": 3, "pay": "Honorarium ~$550; pro fees up to $1,500–2,500", "how": "Pitch big-idea essays (2,000–6,000 words) via aeon.co/pitch — pitches only, no drafts", "link": "https://aeon.co/pitch", "status": "watchlist", "notes": "⚠️ CURRENTLY CLOSED for pitches — watch for reopening. Fees set for your country of residence (international OK). Noema backup: the AI-education-infrastructure thesis, global scope. No news/rebuttals/reviews."}, {"id": "upworthy", "name": "Upworthy", "tier": 2, "pay": "~$0.23–0.35/word (~$185–280 per 800 words)", "how": "Pitch via their online pitch form; positive human-interest stories", "link": "https://www.upworthy.com", "status": "not-started", "notes": "✅ Pay confirmed. ⚠️ International eligibility + payment method UNVERIFIED — confirm before submitting. Your recovery/hope story (not the dark side) fits their mission."}], "boxes": [{"id": "afrolicious", "name": "Afrolicious", "status": "OPEN", "claim": "AI gives young Africans without traditional tech access a genuine path into software.", "kit": ["The decision to learn — the trigger", "The phone as the only tool (backdrop only)", "First successful build — the proof", "Laughed at → earned respect", "Fortebet Learning as the CLIMAX"], "offLimits": ["NumPy battle / power cuts / data costs", "The word 'shortcuts'", "The bridge, ₦98k, ₦500k", "'AI won't replace ambition' ending", "Infrastructure/compression thesis"]}, {"id": "row", "name": "Rest of World", "status": "SEALED", "claim": "What it feels like to build serious software on an Android phone in Nigeria.", "kit": ["NumPy install battle (opening)", "Power cuts, data costs, GitHub", "The workflow itself", "The phone became a development machine"], "offLimits": ["Access/opportunity moralizing", "AI education thesis", "The bridge"]}, {"id": "noema", "name": "Noema", "status": "SEALED", "claim": "AI is becoming educational infrastructure, compressing years of learning into months.", "kit": ["Libraries vs AI (most distinctive scene)", "Self-directed learning as the new mode", "Global examples — Kenya, India, Brazil", "Credentialing argument"], "offLimits": ["Nigerian phone-coding texture", "Personal route into software", "'Shortcuts'"]}, {"id": "republic", "name": "The Republic", "status": "SEALED", "claim": "AI is changing what ambition looks like for young Nigerians.", "kit": ["Nigerian learning culture (WhatsApp groups, YouTube, community)", "Lagos fieldwork + interviews (TO DO)", "Before/after examples in classrooms"], "offLimits": ["'AI + effort = opportunity' ending", "Infrastructure thesis", "The bridge"]}, {"id": "incomedaily", "name": "Income Daily", "status": "SEALED", "claim": "The internet sold me wealth; programming taught me value.", "kit": ["Trading bots and online schemes", "Becoming a center manager (claim it)", "Work beats hype — the money numbers"], "offLimits": ["The word 'shortcuts'", "Gambling addiction psychology", "AI philosophy"]}, {"id": "byline", "name": "Byline", "status": "PAUSED", "claim": "The real addiction wasn't gambling — it was shortcuts.", "kit": ["Sleeping under the bridge (opening)", "₦98k win from ₦200", "₦500k loss", "Recovery through programming"], "offLimits": ["Betting shop interior", "Family break", "Access/opportunity"]}, {"id": "vox", "name": "Vox First Person", "status": "SEALED", "claim": "Gambling addiction isn't just about money — it changes how you think and how hard rebuilding is.", "kit": ["Betting shop interior", "The family break", "Cognitive damage — how gambling rewires thinking", "Rebuild as a social story", "Fortebet job setting"], "offLimits": ["The bridge scene", "The 'shortcuts' thesis", "₦98k / ₦500k numbers"]}], "tasks": [{"t": "Publish 1–2 pieces on Medium — first clip THIS WEEK", "done": false}, {"t": "Afrolicious draft ready by 1 Sep (door scenes only)", "done": false}, {"t": "Send Afrolicious a reminder 4–7 Sep if she's silent", "done": false}, {"t": "Pitch TechCabal ($175) + Zikoko (pays)", "done": false}, {"t": "Apply: African Arguments fellowship (~$250/article)", "done": false}, {"t": "2 new pitches every 2 weeks — next batch ~21 Aug", "done": false}, {"t": "Deploy PitchLedger to GitHub Pages", "done": false}, {"t": "WhatCulture: sign up + pitch 3 listicle ideas (locked in)", "done": false}, {"t": "4 Sep — Afrolicious pitch goes to editorial: final draft + 2 backup pitches READY", "done": false}, {"t": "Efiko: send best literary piece (2,500+ words = ₦30k) — submissions@efikomag.com", "done": false}, {"t": "Lagos Review: write the Loss & Grief essay (max 1,500w) — call closes 31 Dec", "done": false}, {"t": "Open Payoneer or Geegpay USD account (STATEMENT + Lagos Review pay dollars)", "done": false}, {"t": "WondersList article sent — first paid submission ✅", "done": true}], "drafts": [{"id": "d-afrolicious", "title": "Afrolicious — essay outline (ready to write)", "outlet": "Afrolicious", "updated": "2026-08-07", "text": "THE IDEA: AI is giving young Africans without traditional tech access a genuine path into software.\n\nYOUR MATERIAL (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nDON'T USE (belongs to other stories):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING ideas (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING: access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not a slogan.\n\nLength: 1,000–1,500 words. Paste your draft here and it saves itself."}]};
+var mem={};
 function sget(k){ try{ return window.localStorage.getItem(k); }catch(e){ return mem[k]!==undefined?mem[k]:null; } }
 function sset(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){} mem[k]=v; }
-
-/* ================= STATUSES (plain words) ================= */
-var STATUS = ["PITCHED","NUDGED1","NUDGED2","YES","NO","CLOSED","PUBLISHED","PAID","PAUSED"];
-var ST_LABEL = {PITCHED:"Waiting",NUDGED1:"Reminder sent",NUDGED2:"2 reminders sent",YES:"Accepted! 🎉",NO:"No",CLOSED:"Closed",PUBLISHED:"Published 📄",PAID:"Paid 💰",PAUSED:"On hold"};
-var ACTIVE = ["PITCHED","NUDGED1","NUDGED2"];
-var BOX_LABEL = {OPEN:"Ready to write",SEALED:"Wait for their yes",PAUSED:"On hold",CLOSED:"Closed"};
-
-/* ================= SEED ================= */
-function seed(){
-  return {
-    v21:1,
-    appName:"PitchLedger",
-    outlets:[
-      {id:"afrolicious",name:"Afrolicious",website:"https://afrolicious.com",type:"Magazine",status:"YES",box:"OPEN",
-       pitchDate:"2026-08-04",nudgeDays:31,closeDays:45,editorName:"Ann Daramola",editorEmail:"",
-       claim:"AI is giving young Africans without traditional tech access a genuine path into software.",
-       kit:"Door scenes: the decision to learn, first successful build, Fortebet Learning as proof, laughed-at → earned respect.",
-       offLimits:"NumPy battle · power cuts · 'shortcuts' · the bridge · betting shop interior",
-       wordCount:"1,000–1,500",pay:"TBD",payMethod:"",
-       notes:"Ann said YES (4 Aug): 'very intrigued… would love to publish it… restructuring… reach back out in one month.' Draft ready by 1 Sep. Don't reuse the phone-setup opening or Republic's ending.",
-       aiPolicy:"None stated — write it yourself anyway.",
-       publishedLink:"",
-       log:[
-         {d:"2026-08-04",e:"Ann: very intrigued, wants to publish after restructuring, will follow up in ~1 month."},
-         {d:"2026-08-07",e:"Replied 'Looking forward to it!'"}
-       ]},
-      {id:"row",name:"Rest of World",website:"https://restofworld.org",type:"Magazine",status:"PITCHED",box:"SEALED",
-       pitchDate:"",nudgeDays:28,closeDays:56,editorName:"",editorEmail:"",
-       claim:"What it actually feels like to build serious software on an Android phone in Nigeria.",
-       kit:"NumPy install battle · power cuts · data costs · GitHub · the phone as a development machine.",
-       offLimits:"'Access/opportunity' moralizing · AI education thesis · the bridge",
-       wordCount:"800–1,000 (Ideas)",pay:"~$1/word",payMethod:"Bank",
-       notes:"Reminder at 3–4 weeks after pitch date. The machine, not the door.",
-       publishedLink:"",log:[]},
-      {id:"noema",name:"Noema",website:"https://noemamag.com",type:"Magazine",status:"PITCHED",box:"SEALED",
-       pitchDate:"",nudgeDays:30,closeDays:60,editorName:"",editorEmail:"",
-       claim:"AI is becoming educational infrastructure, compressing years of learning into months — not replacing effort, but changing how expertise is built.",
-       kit:"Libraries vs AI · self-directed learning · global examples (Kenya, India, Brazil) · credentialing argument.",
-       offLimits:"Nigerian phone-coding texture · personal route into software · 'shortcuts'",
-       wordCount:"essay",pay:"~$3,000",payMethod:"Bank",
-       notes:"Replies within ~1 month if accepted. If silent past 6 weeks → re-tool for Aeon.",
-       publishedLink:"",log:[]},
-      {id:"republic",name:"The Republic",website:"https://republic.com.ng",type:"Journal",status:"PITCHED",box:"SEALED",
-       pitchDate:"",nudgeDays:21,closeDays:42,editorName:"",editorEmail:"editors@republic.com.ng",
-       claim:"AI is changing what ambition looks like for young Nigerians.",
-       kit:"Nigerian context · youth · coding culture · self-learning · REPORTING needed (interviews, Lagos fieldwork).",
-       offLimits:"'AI + effort = opportunity' ending (Afrolicious owns access) · infrastructure thesis",
-       wordCount:"1,500–3,500",pay:"₦21k–₦150k by format (themed calls ₦200k–₦500k)",payMethod:"Bank (naira)",
-       notes:"VERIFIED 28 Aug: pitch via the FORMS at rpublc.com/submissions — NOT email. Rates: Analysis ₦36k · Personal Essay ₦100k · Deep Dive/Reportage ₦150k · themed calls ₦200k–₦500k. Fiction CLOSED. 5% withholding tax. Needs reporting, not just memoir.",
-       aiPolicy:"None stated — original reporting required.",
-       publishedLink:"",log:[]},
-      {id:"incomedaily",name:"Income Daily",website:"",type:"Newsletter",status:"PITCHED",box:"SEALED",
-       pitchDate:"",nudgeDays:14,closeDays:28,editorName:"",editorEmail:"",
-       claim:"The internet sold me wealth; programming taught me value.",
-       kit:"Trading bots · online schemes · skill-building · work vs hype · becoming a center manager.",
-       offLimits:"The word 'shortcuts' (Byline owns it) · gambling addiction psychology",
-       wordCount:"",pay:"TBD",payMethod:"",
-       notes:"Fast outlet. Reminder at 2 weeks. End on value/work, not 'shortcuts'.",
-       publishedLink:"",log:[]},
-      {id:"byline",name:"Byline",website:"",type:"Platform",status:"PAUSED",box:"PAUSED",
-       pitchDate:"",nudgeDays:14,closeDays:28,editorName:"",editorEmail:"",
-       claim:"The real addiction wasn't gambling — it was shortcuts.",
-       kit:"Sleeping under the bridge (opening) · ₦98k win · ₦500k loss · recovery through programming.",
-       offLimits:"Betting shop interior · family break (Vox) · access/opportunity (Afrolicious)",
-       wordCount:"",pay:"",payMethod:"",
-       notes:"PAUSED by choice — Afrolicious is priority. Material reserved; can be opened any time.",
-       publishedLink:"",log:[]},
-      {id:"vox",name:"Vox (First Person)",website:"https://vox.com",type:"Magazine",status:"PITCHED",box:"SEALED",
-       pitchDate:"",nudgeDays:21,closeDays:42,editorName:"",editorEmail:"",
-       claim:"Gambling addiction isn't just about money — it changes how you think and how hard it is to rebuild.",
-       kit:"Betting shop interior · the family break · cognitive damage · rebuild as a social story · Fortebet job setting.",
-       offLimits:"The bridge scene · 'shortcuts' thesis · ₦98k/₦500k numbers (Byline)",
-       wordCount:"800–1,500",pay:"$400–500",payMethod:"Bank",
-       notes:"Needs a 'why now' hook. Vox may ask for a full draft within days.",
-       publishedLink:"",log:[]},
-      {id:"whatculture",name:"WhatCulture",website:"https://whatculture.com/write-for-us",type:"Listicle",status:"PITCHED",box:"OPEN",
-       pitchDate:"2026-08-08",nudgeDays:14,closeDays:28,editorName:"Editorial team",editorEmail:"",
-       claim:"£40 per list article (film/TV/gaming/music/comics), PayPal, no experience needed, unlimited articles.",
-       kit:"Listicles only — entertainment topics, 1,500+ words, 100% original, pitched through their dashboard.",
-       offLimits:"Essay material (Afrolicious, Byline, Vox scenes) stays out of listicles. No republishing sold articles.",
-       wordCount:"1,500+",pay:"£40/article (~$50) + revenue share",payMethod:"PayPal",
-       notes:"LOCKED IN. Signed up 8 Aug. Pitch 3 list ideas this week. Approved articles paid at start of next month. No AI in content creation (check policy).",
-       aiPolicy:"No AI in content creation — their stated policy.",
-       publishedLink:"",log:[
-         {d:"2026-08-08",e:"Locked in — decided to commit. Sign up + pitch list ideas this week."}
-       ]},
-      {id:"wonderslist",name:"WondersList",website:"https://www.wonderslist.com/write-us/",type:"Listicle",status:"PITCHED",box:"OPEN",
-       pitchDate:"2026-08-08",nudgeDays:7,closeDays:21,editorName:"WondersList team",editorEmail:"admin@wonderslist.com",
-       claim:"Top 10 Most Unbelievable Sports Moments of All Time — first paid article ($5).",
-       kit:"Sports listicle: 10 items ranked #10→#1, 1,500+ words, every fact verified with source links.",
-       offLimits:"They own the article forever after publication — never republish it anywhere.",
-       wordCount:"1,511",pay:"$5",payMethod:"PayPal (sodiqibrahim30@gmail.com)",
-       notes:"SENT 8 Aug 2026. Their page: reply ~48h for queries, acceptance a few days, $5 lands within 1–2 weeks. If silent after 7 days, one gentle follow-up, then close at 21 days.",
-       publishedLink:"",log:[
-         {d:"2026-08-08",e:"Article sent to admin@wonderslist.com — FIRST PAID SUBMISSION 🎯"}
-       ]},
-      {id:"communique",name:"Communiqué",website:"https://www.readcommunique.com/p/pitch-communique",type:"Substack",status:"PITCHED",box:"SEALED",pitchDate:"",nudgeDays:21,closeDays:42,editorName:"David I. Adeleke (editor)",editorEmail:"",
-       claim:"How Telegram mini-apps became Nigeria's new entertainment channel — reported from inside one.",
-       kit:"BRYME data: group growth, ad economics, locked-content model · Telegram mini-app trend across Africa · creator economy numbers.",
-       offLimits:"Personal essay material (Afrolicious owns it) — pitch as reported analysis, not memoir.",
-       wordCount:"1,000–1,500",pay:"₦150,000/story ($100 outside NG)",payMethod:"Bank (naira)",
-       aiPolicy:"None stated — rigorously reported original work expected.",
-       notes:"MUST be subscribed (free) first, then submit via the Google Form on their pitch page. Data-driven + a hook. 40k+ audience. Rolling deadline.",
-       publishedLink:"",log:[]},
-      {id:"statement",name:"STATEMENT Africa",website:"https://statementafrica.com",type:"Magazine",status:"PITCHED",box:"SEALED",pitchDate:"",nudgeDays:28,closeDays:56,editorName:"Chisom Peter Job (Managing Editor)",editorEmail:"chisom@statementafrica.com",
-       claim:"Anime and K-drama demand in Nigeria: the streaming gap young Nigerians are bridging with Telegram.",
-       kit:"BRYME entertainment desk data (what readers actually open) · streaming prices in ₦ · the watchlist economy.",
-       offLimits:"Trading/psychology material · personal essay scenes.",
-       wordCount:"~1,500 (negotiated)",pay:"$0.20–$1.00/word (up to ~$1,500)",payMethod:"USD — Payoneer/Geegpay (open one!)",
-       aiPolicy:"None stated — fresh angles, original work only.",
-       notes:"Email subject: 'PITCH — [headline]' (+ 'Timely' if time-sensitive). MAX 2 pitches per email, then WAIT for reply. Data-backed features favoured; they help build datasets.",
-       publishedLink:"",log:[]},
-      {id:"lagosreview",name:"The Lagos Review",website:"https://thelagosreview.ng",type:"Literary",status:"PITCHED",box:"OPEN",pitchDate:"",nudgeDays:35,closeDays:70,editorName:"",editorEmail:"submissions@thelagosreview.ng",
-       claim:"Loss & Grief essay — the grief of living: what chasing 'making it online' quietly cost me. Full submission, not a pitch.",
-       kit:"One honest personal essay, max 1,500 words. The quiet losses nobody sees — NOT the dramatic scenes already assigned to Byline/Vox.",
-       offLimits:"Gambling addiction specifics (Byline/Vox own them) · phone-coding scenes (Afrolicious owns them).",
-       wordCount:"max 1,500",pay:"$250/essay (paid 1 month after pub)",payMethod:"USD — Payoneer/Geegpay",
-       aiPolicy:"BANNED — 'AI produced essays will not be considered.' Every word must be yours.",
-       notes:"Rolling until 31 Dec 2026. Full essay by email. Top 12 published essays → book collection + one-off $500 royalty. No fiction.",
-       publishedLink:"",log:[]},
-      {id:"efiko",name:"Efiko Magazine",website:"https://efikomag.com/submission-guidelines/",type:"Literary",status:"PITCHED",box:"OPEN",pitchDate:"",nudgeDays:50,closeDays:70,editorName:"",editorEmail:"submissions@efikomag.com",
-       claim:"Best literary piece (Africa as place + perspective) — one strong submission per issue.",
-       kit:"Best existing story/essay, 1,200–5,000 words — 2,500+ published words = the higher pay band.",
-       offLimits:"Anything already published online · material assigned to other boxes.",
-       wordCount:"1,200–5,000 (prose)",pay:"₦30,000 (2,500+ words) / ₦20,000 under",payMethod:"Bank (naira)",
-       aiPolicy:"None stated — but strictly original, unpublished work (anything already online is rejected).",
-       notes:"Word doc · Times New Roman 12pt · double-spaced · numbered pages · genre in subject line · 5-line bio in body · ONE piece per issue · simultaneous OK (tell them if accepted elsewhere). They answer within 50 days — nudge after that.",
-       publishedLink:"",log:[]}
-    ],
-    opps:[
-      {id:"medium",name:"Medium (Partner Program)",tier:1,pay:"Yes — earns from member reads (Nigeria eligible)",how:"Join MPP, publish 1 story, link Stripe",link:"https://medium.com",status:"not-started",notes:"Fastest first clip. Publish 1–2 pieces in your lane THIS WEEK."},
-      {id:"devto",name:"DEV.to",tier:1,pay:"No — exposure/portfolio",how:"Free account, instant publish",link:"https://dev.to",status:"not-started",notes:"freeCodeCamp recommends new writers start here for samples."},
-      {id:"hackernoon",name:"HackerNoon",tier:1,pay:"Contests up to $2,000 (USDT)",how:"Submit story, editor review, contests",link:"https://hackernoon.com",status:"not-started",notes:"Crypto-friendly payments work from Nigeria."},
-      {id:"techcabal",name:"TechCabal",tier:2,pay:"$175 / 1,000–1,200 words",how:"300–400-word pitch → kay@bigcabal.com",link:"https://techcabal.com/come-write-for-us/",status:"not-started",notes:"Needs 2–3 samples — get them from Medium/DEV first."},
-      {id:"zikoko",name:"Zikoko (Big Cabal)",tier:2,pay:"Pays contributors (amount at acceptance)",how:"Pitch via submission form; ruth@bigcabal.com",link:"https://www.zikoko.com/announcements/how-to-write-for-zikoko-a-contributor-guide/",status:"not-started",notes:"Open call for Nigerian creators worldwide. Gambling/recovery + hustle culture fit."},
-      {id:"africanargs",name:"African Arguments",tier:2,pay:"Pays African journalists; fellowship ~$250/article",how:"Submit via write-for-us page; fellowship application",link:"https://africanarguments.org/write-for-us/",status:"not-started",notes:"PRIORITISES African writers based in Africa. Apply to the fellowship."},
-      {id:"techpoint",name:"Techpoint Africa",tier:2,pay:"No pay mentioned — exposure",how:"Full submission ~1,000 words → editor@techpoint.africa",link:"https://techpoint.africa/pitch-us/",status:"not-started",notes:"⚠️ Rejects AI-GENERATED content. 30-day exclusivity."},
-      {id:"fcc",name:"freeCodeCamp News",tier:2,pay:"No pay — huge audience + editing help",how:"Apply via style-guide form (needs 3 samples)",link:"https://www.freecodecamp.org/news/how-to-write-for-freecodecamp/",status:"not-started",notes:"Build 3 samples on DEV.to first. Small approval % — retry."},
-      {id:"omenana",name:"Omenana (African spec-fic)",tier:2,pay:"$20/story",how:"Submit in open windows (check omenana.com)",link:"https://omenana.com/omenana-submissions/",status:"not-started",notes:"Wants African speculative fiction — your fantasy edge."},
-      {id:"fiyah",name:"FIYAH (Black spec-fic)",tier:2,pay:"8¢/word",how:"Submit in themed windows",link:"https://fiyahlitmag.com",status:"not-started",notes:"Black speculative fiction by Black writers — you qualify."},
-      {id:"simfiction",name:"SimFiction Review",tier:2,pay:"10¢/word up to $250 (first-timers)",how:"Online portal, .RTF/.DOCX, disclose AI in cover letter",link:"https://simfictionreview.com/submissions/",status:"not-started",notes:"Actively welcomes AI use + first-time authors. Tech/AI/simulation themes."},
-      {id:"kdp",name:"Amazon KDP (self-publish)",tier:2,pay:"70% royalties",how:"Upload book; AI-generated needs private disclosure",link:"https://kdp.amazon.com",status:"not-started",notes:"Fantasy sells best. Payoneer → naira."},
-      {id:"okadabooks",name:"OkadaBooks (Nigerian)",tier:2,pay:"70% royalties, naira bank transfer",how:"Upload your book, sell to Nigerian readers",link:"https://okadabooks.com",status:"not-started",notes:"Readers pay via airtime. Instant Nigerian presence."},
-      {id:"clarkesworld",name:"Clarkesworld",tier:3,pay:"14¢/word",how:"Online tracker only; no simultaneous subs; no AI",link:"https://clarkesworldmagazine.com/submissions/",status:"watchlist",notes:"~1% acceptance. Read 10 stories first. Nigerian voices winning."},
-      {id:"commonwealth",name:"Commonwealth Short Story Prize",tier:3,pay:"£5,000 overall / £2,500 regional",how:"Free entry ~1 Nov; 2,000–5,000 words; fantasy OK",link:"https://commonwealthfoundation.com",status:"watchlist",notes:"Nigeria eligible. Winners published in Granta."},
-      {id:"textbroker",name:"Textbroker",tier:1,pay:"$0.01–0.09/word, weekly PayPal",how:"Sign up, pass quality test, pick orders",link:"https://www.textbroker.com",status:"not-started",notes:"Open internationally. Low pay but instant work + reviews. Content mill."},
-      {id:"problogger",name:"ProBlogger Job Board",tier:1,pay:"Varies ($50–500+/job)",how:"Free job board — browse listings, apply with samples",link:"https://problogger.com/jobs",status:"not-started",notes:"Best board for remote content gigs; check each ad's international policy."},
-      {id:"konnectng",name:"Konnect Ng",tier:1,pay:"Naira weekly",how:"Sign up, write articles + surveys",link:"https://konnectng.com",status:"not-started",notes:"Nigerian platform, PayPal/bank, weekly. Beginners + students."},
-      {id:"constantcontent",name:"Constant Content",tier:2,pay:"$5–100+/article (you set price)",how:"Submit articles to marketplace, clients buy",link:"https://www.constant-content.com",status:"not-started",notes:"You keep rights until sold; set your own price."},
-      {id:"verblio",name:"Verblio",tier:2,pay:"$15–80/post",how:"Apply, then claim assignments",link:"https://verblio.com",status:"not-started",notes:"Steady blog work; quality-based."},
-      {id:"writeraccess",name:"WriterAccess",tier:2,pay:"$0.10–0.30/word",how:"Apply + niche test",link:"https://www.writeraccess.com",status:"not-started",notes:"Badges raise your rate; monthly payouts."},
-      {id:"contra",name:"Contra",tier:2,pay:"You set rate — 0% commission",how:"Create portfolio, apply to gigs",link:"https://contra.com",status:"not-started",notes:"Keep 100% of earnings. Needs samples."},
-      {id:"moneypantry",name:"MoneyPantry",tier:2,pay:"$50–300/article",how:"Pitch personal finance articles",link:"https://moneypantry.com/write-for-us",status:"not-started",notes:"Finance niche — your hustle/money story fits."},
-      {id:"mentalfloss",name:"Mental Floss",tier:2,pay:"$150+",how:"Pitch interesting facts/trivia",link:"https://www.mentalfloss.com",status:"not-started",notes:"Verify international eligibility before pitching."},
-      {id:"inkitt",name:"Inkitt",tier:2,pay:"Contests + contracts",how:"Upload novel, enter contests",link:"https://www.inkitt.com",status:"not-started",notes:"Free fiction platform with writing contests + book contracts."},
-      {id:"hubpages",name:"HubPages",tier:2,pay:"Ad revenue share",how:"Publish evergreen articles",link:"https://hubpages.com",status:"not-started",notes:"Passive income, PayPal monthly."},
-      {id:"aeon",name:"Aeon",tier:3,pay:"Honorarium ~$550; pro fees up to $1,500–2,500",how:"Pitch big-idea essays (2,000–6,000 words) via aeon.co/pitch — pitches only, no drafts",link:"https://aeon.co/pitch",status:"watchlist",notes:"⚠️ CURRENTLY CLOSED for pitches — watch for reopening. Fees set for your country of residence (international OK). Noema backup: the AI-education-infrastructure thesis, global scope. No news/rebuttals/reviews."},
-      {id:"upworthy",name:"Upworthy",tier:2,pay:"~$0.23–0.35/word (~$185–280 per 800 words)",how:"Pitch via their online pitch form; positive human-interest stories",link:"https://www.upworthy.com",status:"not-started",notes:"✅ Pay confirmed. ⚠️ International eligibility + payment method UNVERIFIED — confirm before submitting. Your recovery/hope story (not the dark side) fits their mission."}
-    ],
-    boxes:[
-      {id:"afrolicious",name:"Afrolicious",status:"OPEN",claim:"AI gives young Africans without traditional tech access a genuine path into software.",kit:["The decision to learn — the trigger","The phone as the only tool (backdrop only)","First successful build — the proof","Laughed at → earned respect","Fortebet Learning as the CLIMAX"],offLimits:["NumPy battle / power cuts / data costs","The word 'shortcuts'","The bridge, ₦98k, ₦500k","'AI won't replace ambition' ending","Infrastructure/compression thesis"]},
-      {id:"row",name:"Rest of World",status:"SEALED",claim:"What it feels like to build serious software on an Android phone in Nigeria.",kit:["NumPy install battle (opening)","Power cuts, data costs, GitHub","The workflow itself","The phone became a development machine"],offLimits:["Access/opportunity moralizing","AI education thesis","The bridge"]},
-      {id:"noema",name:"Noema",status:"SEALED",claim:"AI is becoming educational infrastructure, compressing years of learning into months.",kit:["Libraries vs AI (most distinctive scene)","Self-directed learning as the new mode","Global examples — Kenya, India, Brazil","Credentialing argument"],offLimits:["Nigerian phone-coding texture","Personal route into software","'Shortcuts'"]},
-      {id:"republic",name:"The Republic",status:"SEALED",claim:"AI is changing what ambition looks like for young Nigerians.",kit:["Nigerian learning culture (WhatsApp groups, YouTube, community)","Lagos fieldwork + interviews (TO DO)","Before/after examples in classrooms"],offLimits:["'AI + effort = opportunity' ending","Infrastructure thesis","The bridge"]},
-      {id:"incomedaily",name:"Income Daily",status:"SEALED",claim:"The internet sold me wealth; programming taught me value.",kit:["Trading bots and online schemes","Becoming a center manager (claim it)","Work beats hype — the money numbers"],offLimits:["The word 'shortcuts'","Gambling addiction psychology","AI philosophy"]},
-      {id:"byline",name:"Byline",status:"PAUSED",claim:"The real addiction wasn't gambling — it was shortcuts.",kit:["Sleeping under the bridge (opening)","₦98k win from ₦200","₦500k loss","Recovery through programming"],offLimits:["Betting shop interior","Family break","Access/opportunity"]},
-      {id:"vox",name:"Vox First Person",status:"SEALED",claim:"Gambling addiction isn't just about money — it changes how you think and how hard rebuilding is.",kit:["Betting shop interior","The family break","Cognitive damage — how gambling rewires thinking","Rebuild as a social story","Fortebet job setting"],offLimits:["The bridge scene","The 'shortcuts' thesis","₦98k / ₦500k numbers"]}
-    ],
-    tasks:[
-      {t:"Publish 1–2 pieces on Medium — first clip THIS WEEK",done:false},
-      {t:"Afrolicious draft ready by 1 Sep (door scenes only)",done:false},
-      {t:"Send Afrolicious a reminder 4–7 Sep if she's silent",done:false},
-      {t:"Pitch TechCabal ($175) + Zikoko (pays)",done:false},
-      {t:"Apply: African Arguments fellowship (~$250/article)",done:false},
-      {t:"2 new pitches every 2 weeks — next batch ~21 Aug",done:false},
-      {t:"Deploy PitchLedger to GitHub Pages",done:false},
-      {t:"WhatCulture: sign up + pitch 3 listicle ideas (locked in)",done:false},
-      {t:"4 Sep — Afrolicious pitch goes to editorial: final draft + 2 backup pitches READY",done:false},
-      {t:"Efiko: send best literary piece (2,500+ words = ₦30k) — submissions@efikomag.com",done:false},
-      {t:"Lagos Review: write the Loss & Grief essay (max 1,500w) — call closes 31 Dec",done:false},
-      {t:"Open Payoneer or Geegpay USD account (STATEMENT + Lagos Review pay dollars)",done:false},
-      {t:"WondersList article sent — first paid submission ✅",done:true}
-    ],
-    drafts:[
-      {id:"d-afrolicious",title:"Afrolicious — essay outline (ready to write)",outlet:"Afrolicious",updated:"2026-08-07",text:"THE IDEA: AI is giving young Africans without traditional tech access a genuine path into software.\n\nYOUR MATERIAL (only these scenes):\n- The decision to learn — the trigger\n- The phone as the only tool (backdrop only)\n- First successful build — the proof\n- Laughed at → earned respect\n- Fortebet Learning as the CLIMAX\n\nDON'T USE (belongs to other stories):\n- NumPy battle / power cuts / data costs (Rest of World)\n- The word 'shortcuts' (Byline)\n- The bridge, ₦98k, ₦500k (Byline)\n- 'AI won't replace ambition' ending (The Republic)\n- Infrastructure/compression thesis (Noema)\n- Betting shop interior, family break (Vox)\n\nOPENING ideas (door moments, not phone-setup scenes):\n1. The moment someone laughed at the idea that you were learning to build software.\n2. The first time a built app actually ran — what it felt like.\n3. Someone asking 'how did you do that on a phone?' — and realizing the answer was a story.\n\nENDING: access + persistence — personal, specific, hopeful. End on what the door led to (Fortebet Learning), not a slogan.\n\nLength: 1,000–1,500 words. Paste your draft here and it saves itself."}
-    ]
-  };
-}
-
-/* ================= STATE ================= */
-var state;
+function seed(){ return JSON.parse(JSON.stringify(SEED)); }
 function load(){
-  var raw = sget("pitchledger_v2");
-  if(raw){ try{ var s = JSON.parse(raw); if(s && s.outlets){
-      if(!s.drafts) s.drafts=[];
-      /* v2.1 (28 Aug 2026): merge in BRYME-researched outlets + verified facts. Never touches your own records. */
-      if(!s.v21){
-        var ns=seed();
-        ns.outlets.forEach(function(si){ if(!s.outlets.some(function(x){ return x.id===si.id; })) s.outlets.push(si); });
-        var rep=s.outlets.find(function(x){ return x.id==="republic"; });
-        if(rep){ rep.pay="₦21k–₦150k by format (themed calls ₦200k–₦500k)";
-          if(!rep.log.some(function(l){ return /VERIFIED 28 Aug/.test(l.e); })) rep.log.push({d:"2026-08-28",e:"VERIFIED (BRYME research): pitch via FORMS at rpublc.com/submissions — NOT email. Analysis ₦36k · Essay ₦100k · Deep Dive ₦150k. Fiction closed. 5% WHT."}); }
-        ["afrolicious","whatculture"].forEach(function(id){ var o=s.outlets.find(function(x){ return x.id===id; }); if(o && !o.aiPolicy){ o.aiPolicy = id==="afrolicious" ? "None stated — write it yourself anyway." : "No AI in content creation — their stated policy."; } });
-        (ns.tasks||[]).forEach(function(t){ if(!s.tasks) s.tasks=[]; if(!s.tasks.some(function(x){ return x.t===t.t; })) s.tasks.push(t); });
-        s.v21=1; save(s);
-      }
-      return s;
-  } }catch(e){} }
-  /* Migrate from v1 storage: keep user data, merge in new seed entries */
-  var old = sget("pitchledger_v1");
-  if(old){ try{
-    var o = JSON.parse(old);
-    if(o && o.outlets){
-      var ns = seed();
-      ns.outlets.forEach(function(si){ if(!o.outlets.some(function(x){ return x.id===si.id; })) o.outlets.push(si); });
-      if(!o.opps){ o.opps=ns.opps; } else { ns.opps.forEach(function(si){ if(!o.opps.some(function(x){ return x.id===si.id; })) o.opps.push(si); }); }
-      if(!o.boxes) o.boxes=ns.boxes;
-      if(!o.tasks) o.tasks=ns.tasks;
-      if(!o.drafts) o.drafts=[];
-      if(!o.appName) o.appName=ns.appName;
-      sset("pitchledger_v2", JSON.stringify(o));
-      return o;
-    }
+  var raw=sget("pitchledger_v2");
+  if(raw){ try{ var s=JSON.parse(raw);
+    if(s&&s.outlets){ if(!s.drafts)s.drafts=[]; if(!s.opps)s.opps=seed().opps;
+      if(!s.boxes)s.boxes=seed().boxes; if(!s.tasks)s.tasks=seed().tasks; return s; }
   }catch(e){} }
-  var s = seed(); save(s); return s;
+  var old=sget("pitchledger_v1"); /* very old version — carry everything across */
+  if(old){ try{ var o=JSON.parse(old);
+    if(o&&o.outlets){ var ns=seed();
+      ns.outlets.forEach(function(si){ if(!o.outlets.some(function(x){return x.id===si.id;})) o.outlets.push(si); });
+      o.drafts=o.drafts||[]; o.opps=o.opps||ns.opps; o.boxes=o.boxes||ns.boxes; o.tasks=o.tasks||ns.tasks;
+      o.appName=o.appName||ns.appName; sset("pitchledger_v2",JSON.stringify(o)); return o; }
+  }catch(e){} }
+  var s=seed(); save(s); return s;
 }
-function save(s){ sset("pitchledger_v2", JSON.stringify(s)); }
+function save(s){ sset("pitchledger_v2",JSON.stringify(s)); }
 
-/* ================= DATE HELPERS ================= */
-function parseISO(iso){ if(!iso) return null; var p=iso.split("-"); if(p.length<3) return null; return new Date(+p[0],+p[1]-1,+p[2]); }
-function toISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function addDays(iso,n){ var d=parseISO(iso); if(!d) return null; d.setDate(d.getDate()+n); return toISO(d); }
-function daysUntil(iso){ var d=parseISO(iso); if(!d) return null; var t=parseISO(toISO(new Date())); return Math.round((d-t)/86400000); }
-function fmt(iso){ if(!iso) return "—"; var d=parseISO(iso); return d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
-function todayISO(){ return toISO(new Date()); }
-function wordCount(s){ s=(s||"").trim(); return s ? s.split(/\s+/).length : 0; }
-function toast(msg){
-  var d=document.createElement("div"); d.className="toast"; d.textContent=msg;
-  document.body.appendChild(d);
-  setTimeout(function(){ d.classList.add("out"); setTimeout(function(){ d.remove(); },450); },2200);
-}
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+/* ================= HELPERS ================= */
+function esc(x){ return String(x==null?"":x).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function parseISO(iso){ return new Date(iso+"T00:00:00"); }
+function todayISO(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(iso,n){ var d=parseISO(iso); d.setDate(d.getDate()+n);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function daysUntil(iso){ if(!iso) return null; return Math.floor((parseISO(iso)-parseISO(todayISO()))/86400000); }
+function fmt(iso){ if(!iso) return "—"; return parseISO(iso).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
+function fmtLong(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); }
+function daysOut(o){ return o.pitchDate? Math.max(0,-daysUntil(o.pitchDate)) : null; }
 
-/* ================= STATUS INFO (plain words) ================= */
-function nudgeDate(o){ return o.pitchDate?addDays(o.pitchDate,o.nudgeDays):null; }
-function closeDate(o){ return o.pitchDate?addDays(o.pitchDate,o.closeDays):null; }
+var STATUS=["PITCHED","NUDGED1","NUDGED2","YES","NO","CLOSED","PUBLISHED","PAID","PAUSED"];
+var ST_LABEL={PITCHED:"Waiting",NUDGED1:"Reminded",NUDGED2:"Reminded ×2",YES:"Accepted",NO:"No",CLOSED:"Closed",PUBLISHED:"Published",PAID:"Paid",PAUSED:"On hold"};
+var ST_LINE={PITCHED:"Pitch sent — waiting on the reply",NUDGED1:"One reminder sent",NUDGED2:"Two reminders sent",YES:"They said yes 🎉",NO:"They said no",CLOSED:"Closed — move on",PUBLISHED:"Published 📄",PAID:"Paid 💰",PAUSED:"Paused by me"};
+var ACTIVE=["PITCHED","NUDGED1","NUDGED2"];
+var VIEWS=[["today","Today"],["ledger","The Ledger"],["boxes","Story Boxes"],["opps","Opportunities"],["drafts","Drafts Pad"],["settings","Settings"]];
+var state, view="today", ledgerFilter="ALL", curDraft=null, draftTimer=null;
 
-function urgency(o){
-  if(!ACTIVE.includes(o.status)) return null;
-  if(!o.pitchDate) return {level:"none",label:"Add the date you pitched",days:null};
-  if(o.status==="NUDGED2"){
-    var cd=closeDate(o), d=daysUntil(cd);
-    if(d<0) return {level:"red",label:"Time to close this or decide",days:d};
-    if(d<=7) return {level:"amber",label:"Decide in "+d+" day"+(d===1?"":"s"),days:d};
-    return {level:"ok",label:"Decide in "+d+" day"+(d===1?"":"s"),days:d};
-  }
-  var nd=nudgeDate(o), d=daysUntil(nd);
-  if(d<0) return {level:"red",label:"Send the reminder now",days:d};
-  if(d===0) return {level:"red",label:"Send the reminder today",days:0};
-  if(d<=7) return {level:"amber",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
-  return {level:"ok",lablabel:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
-  return {level:"ok",label:"Reminder in "+d+" day"+(d===1?"":"s"),days:d};
+/* ================= RENDER SHELL ================= */
+function renderNav(){
+  var h="";
+  VIEWS.forEach(function(v){ h+='<button data-nav="'+v[0]+'" class="'+(view===v[0]?"on":"")+'">'+v[1]+'</button>'; });
+  document.getElementById("nav").innerHTML=h;
+  document.getElementById("brandName").innerHTML=esc((state.appName||"PitchLedger").toUpperCase()).replace(/LEDGER/,"<span>LEDGER</span>")||"PITCH<span>LEDGER</span>";
+  document.getElementById("todayDate").textContent=fmtLong(new Date());
 }
-function cardClass(o){
-  var u=urgency(o);
-  if(u&&u.level==="red") return "redbar";
-  if(u&&u.level==="amber") return "amberbar";
-  if(o.status==="YES") return "greenbar";
-  if(ACTIVE.includes(o.status)) return "bluebar";
-  return "graybar";
+function setView(v){ view=v; renderAll(); window.scrollTo(0,0); }
+function renderAll(){ renderNav(); var f={today:renderToday,ledger:renderLedger,boxes:renderBoxes,opps:renderOpps,drafts:renderDrafts,settings:renderSettings}[view]; document.getElementById("view").innerHTML=f(); }
+
+/* ================= PIECES ================= */
+function stamp(o){ return '<span class="stamp st-'+o.status+'">'+ST_LABEL[o.status]+'</span>'; }
+function dayBlock(o){
+  var d=daysOut(o);
+  if(d===null) return '<div class="daycount"><b>—</b><span class="micro">not sent yet</span></div>';
+  return '<div class="daycount"><b>'+d+'</b><span class="micro">day'+(d===1?"":"s")+' out</span></div>';
 }
-/* Friendly main line for a card */
-function countdownHTML(o){
-  var u=urgency(o);
-  if(o.status==="YES"){
-    return '<div class="cd"><span class="num green">Accepted! 🎉</span><span class="lbl">Write the piece now — draft ready by 1 Sep</span>'+(nudgeDate(o)?'<span class="sub">If silent, gentle reminder '+fmt(nudgeDate(o))+'</span>':'')+'</div>';
-  }
-  if(o.status==="PAUSED") return '<div class="cd"><span class="num dim">On hold</span><span class="lbl">Material is reserved. Open it anytime.</span></div>';
-  if(o.status==="NO"||o.status==="CLOSED") return '<div class="cd"><span class="num red">Closed</span><span class="lbl">This one is done. Material can be reused elsewhere.</span></div>';
-  if(o.status==="PUBLISHED") return '<div class="cd"><span class="num dim">Published 📄</span><span class="lbl">Congrats! Mark paid when the money lands.</span></div>';
-  if(o.status==="PAID") return '<div class="cd"><span class="num green">Paid 💰</span><span class="lbl">Nice. On to the next pitch.</span></div>';
-  if(u&&u.level==="red") return '<div class="cd"><span class="num red">'+(u.days>0?"+"+u.days:u.days)+'</span><span class="lbl">'+esc(u.label)+'</span>'+(nudgeDate(o)?'<span class="sub">was due '+fmt(nudgeDate(o))+'</span>':'')+'</div>';
-  if(u&&u.level==="amber") return '<div class="cd"><span class="num amber">'+u.days+'</span><span class="lbl">'+esc(u.label)+'</span><span class="sub">on '+fmt(nudgeDate(o))+'</span></div>';
-  if(u&&u.level==="ok") return '<div class="cd"><span class="num green">'+u.days+'</span><span class="lbl">'+esc(u.label)+'</span><span class="sub">on '+fmt(nudgeDate(o))+'</span></div>';
-  return '<div class="cd"><span class="num dim">—</span><span class="lbl">Add the date you pitched, and the countdown starts.</span></div>';
+function metaLine(o){
+  var p=[];
+  if(o.pay) p.push('<span class="micro">'+esc(o.pay)+'</span>');
+  if(o.wordCount) p.push('<span class="micro">'+esc(o.wordCount)+'</span>');
+  if(o.aiPolicy) p.push('<span class="micro" style="color:var(--amber)">🤖 '+esc(o.aiPolicy.length>34?o.aiPolicy.slice(0,34)+"…":o.aiPolicy)+'</span>');
+  return p.length?'<div class="e-meta">'+p.join("")+'</div>':"";
+}
+function detRow(k,v,html){ return v?'<div class="detrow"><span class="k micro">'+k+'</span><span class="v">'+(html?v:esc(v))+'</span></div>':""; }
+function logHtml(o){
+  if(!o.log||!o.log.length) return "";
+  var h='<div class="log">';
+  o.log.slice().reverse().forEach(function(l){ h+='<div class="logentry"><i>'+fmt(l.d)+'</i>'+esc(l.e)+'</div>'; });
+  return h+"</div>";
 }
 function actionButtons(o){
-  var b="";
-  if(o.status==="PITCHED"||o.status==="NUDGED1"){
-    b+='<button class="bbtn amber" data-act="mark" data-id="'+o.id+'" data-to="'+(o.status==="PITCHED"?"NUDGED1":"NUDGED2")+'">💬 Reminder sent</button>';
-    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="YES">🎉 They said yes</button>';
-    b+='<button class="bbtn red" data-act="mark" data-id="'+o.id+'" data-to="NO">No reply — close it</button>';
-  } else if(o.status==="NUDGED2"){
-    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="YES">🎉 They said yes</button>';
-    b+='<button class="bbtn red" data-act="mark" data-id="'+o.id+'" data-to="CLOSED">Close it</button>';
-  } else if(o.status==="YES"){
-    b+='<button class="bbtn blue" data-act="mark" data-id="'+o.id+'" data-to="PUBLISHED">📄 I published it</button>';
-  } else if(o.status==="PUBLISHED"){
-    b+='<button class="bbtn green" data-act="mark" data-id="'+o.id+'" data-to="PAID">💰 I got paid</button>';
-  } else if(o.status==="PAUSED"||o.status==="NO"||o.status==="CLOSED"){
-    b+='<button class="bbtn blue" data-act="mark" data-id="'+o.id+'" data-to="PITCHED">↩️ Reopen</button>';
-  }
-  return b;
+  var b=[], act=function(t,to){ return '<button class="bbtn" data-act="st" data-id="'+o.id+'" data-to="'+to+'">'+t+'</button>'; };
+  if(o.status==="PITCHED") b.push(act("✉️ Reminder sent","NUDGED1"));
+  if(o.status==="NUDGED1") b.push(act("✉️ Reminder ×2","NUDGED2"));
+  if(ACTIVE.indexOf(o.status)>-1||o.status==="PAUSED") b.push(act("✅ Accepted","YES"));
+  if(o.status==="YES") b.push(act("📄 Published","PUBLISHED"));
+  if(o.status==="PUBLISHED") b.push(act("💰 Paid","PAID"));
+  if(ACTIVE.indexOf(o.status)>-1) b.push(act("🗄 Close it","CLOSED"));
+  b.push('<button class="bbtn gray" data-act="edit" data-id="'+o.id+'">✏️ Edit</button>');
+  b.push('<button class="bbtn red" data-act="del" data-id="'+o.id+'">Delete</button>');
+  return '<div class="bigbtns">'+b.join("")+'</div>';
 }
-
-/* ================= RENDER: STATS ================= */
-function renderStats(){
-  var el=document.getElementById("stats");
-  var active=state.outlets.filter(function(o){return ACTIVE.includes(o.status);}).length;
-  var yes=state.outlets.filter(function(o){return o.status==="YES";}).length;
-  var pub=state.outlets.filter(function(o){return ["PUBLISHED","PAID"].includes(o.status);}).length;
-  var overdue=state.outlets.filter(function(o){var u=urgency(o);return u&&u.level==="red";}).length;
-  var h='<span class="chip">📤 Waiting <b>'+active+'</b></span><span class="chip">🎉 Accepted <b>'+yes+'</b></span><span class="chip">📄 Published <b>'+pub+'</b></span>';
-  if(overdue) h+='<span class="chip warn">🔔 Needs you now <b>'+overdue+'</b></span>';
-  el.innerHTML=h;
-}
-
-/* ================= RENDER: TODAY ================= */
-function renderToday(){
-  var el=document.getElementById("tab-today");
-  var act=state.outlets.filter(function(o){return ACTIVE.includes(o.status);});
-  var need=act.filter(function(o){var u=urgency(o);return u&&(u.level==="red"||u.level==="amber");}).sort(function(a,b){return (urgency(a).days||0)-(urgency(b).days||0);});
-  var yesBut=state.outlets.filter(function(o){return o.status==="YES";});
-  var waiting=act.filter(function(o){var u=urgency(o);return !u||u.level==="ok";}).sort(function(a,b){return (urgency(a)&&urgency(a).days||999)-(urgency(b)&&urgency(b).days||999);});
-  var h="";
-  if(!sget("welcomeSeen")){
-    h+='<div class="welcome"><h3>Welcome, Sodiq 👋</h3><p><b>This app tracks your writing pitches.</b> Three things to know:</p><p>1️⃣ <b>My Pitches</b> — every place you sent a story, with a live countdown telling you <b>when to send a reminder</b>.</p><p>2️⃣ <b>Drafts</b> — paste any essay or draft here; it saves itself as you type.</p><p>3️⃣ <b>Ideas</b> — new places to pitch, with how much they pay.</p><p>Tap a pitch → <b>"Details"</b> to see dates, the editor, and your story material. Nothing is complicated — if something confuses you, ask me and I will fix it.</p><button class="okbtn" data-act="welcomedone">Got it — let\'s go 💪</button></div>';
-  }
-  h+='<h2>🔔 Needs you now <span class="count">'+(need.length+yesBut.length)+'</span></h2>';
-  if(!need.length&&!yesBut.length) h+='<div class="empty">Nothing urgent. Relax — check your to-do list below.</div>';
-  need.forEach(function(o){ h+=outletCard(o); });
-  yesBut.forEach(function(o){ h+=outletCard(o); });
-  h+='<h2>📝 Your to-do list</h2>';
-  h+='<div class="card">';
-  state.tasks.forEach(function(t,i){
-    h+='<div class="task'+(t.done?" done":"")+'"><input type="checkbox" data-task="'+i+'" '+(t.done?"checked":"")+'><div>'+esc(t.t)+'</div></div>';
-  });
-  h+='<div style="display:flex;gap:8px;margin-top:10px"><input class="search" id="newTask" style="margin:0" placeholder="Add a task…"><button class="bbtn green" style="flex:0 0 auto;padding:11px 14px" data-act="addtask">Add</button></div>';
-  h+='</div>';
-  h+='<h2>⏳ Waiting quietly <span class="count">'+waiting.length+'</span></h2>';
-  if(!waiting.length) h+='<div class="empty">Nothing waiting right now.</div>';
-  waiting.forEach(function(o){
-    var u=urgency(o);
-    var cd=u&&u.days!==null?'<span class="mcd '+(u.level||"")+'">reminder in '+u.days+'d</span>':'<span class="mcd">add pitch date</span>';
-    h+='<div class="mini"><span class="mname">'+esc(o.name)+'</span>'+cd+'</div>';
-  });
-  el.innerHTML=h;
-}
-
-/* ================= RENDER: MY PITCHES ================= */
-var filter="ALL", query="";
-function renderOutlets(){
-  var el=document.getElementById("tab-outlets");
-  var list=state.outlets.slice();
-  if(filter!=="ALL") list=list.filter(function(o){return o.status===filter;});
-  if(query) list=list.filter(function(o){return (o.name+" "+o.claim+" "+(o.editorName||"")).toLowerCase().indexOf(query.toLowerCase())>-1;});
-  list.sort(function(a,b){
-    var ua=urgency(a),ub=urgency(b);
-    var ra=(ua?(ua.days===null?999:ua.days):998), rb=(ub?(ub.days===null?999:ub.days):998);
-    return ra-rb;
-  });
-  var h='<h2>📤 My Pitches <span class="count">'+state.outlets.length+'</span></h2>';
-  h+='<div class="note" style="margin-bottom:12px"><b>How it works:</b> the number is <b>days until you send a reminder</b> (a polite "any news?" email). After 2 reminders with no answer, close it and move on. Tap a pitch → <b>Details</b> to see everything.</div>';
-  h+='<button class="bbtn green" data-act="newoutlet" style="width:100%;margin-bottom:14px">＋ Add a new pitch</button>';
-  h+='<div class="filters">';
-  ["ALL","PITCHED","NUDGED1","NUDGED2","YES","NO","PUBLISHED","PAID","PAUSED"].forEach(function(f){
-    var n=f==="ALL"?state.outlets.length:state.outlets.filter(function(o){return o.status===f;}).length;
-    h+='<button class="fchip'+(filter===f?" on":"")+'" data-filter="'+f+'">'+ST_LABEL[f]+' ('+n+')</button>';
-  });
-  h+='</div><input class="search" id="outletSearch" placeholder="🔍 Search…" value="'+esc(query)+'">';
-  if(!list.length) h+='<div class="empty">Nothing here. Add a pitch or change the filter.</div>';
-  list.forEach(function(o){ h+=outletCard(o); });
-  el.innerHTML=h;
-}
-
-function outletCard(o){
-  var web=o.website?'<span class="tiny">· <a href="'+esc(o.website)+'" target="_blank" rel="noopener">website ↗</a></span>':"";
-  var h='<div class="card '+cardClass(o)+'">';
-  h+='<div class="cardrow"><div class="cardtitle">'+esc(o.name)+' '+web+'</div><span class="pill pill-'+o.status+'">'+ST_LABEL[o.status]+'</span></div>';
-  h+=countdownHTML(o);
-  var btns=actionButtons(o);
-  if(btns) h+='<div class="bigbtns">'+btns+'</div>';
-  h+='<details><summary><span class="arrow">▶</span> Details</summary><div class="det">';
-  var rows="";
-  rows+='<div class="detrow"><span class="k">Pitched on</span><span class="v">'+(o.pitchDate?fmt(o.pitchDate):"<span style='color:var(--amber)'>not set yet</span>")+'</span></div>';
-  rows+='<div class="detrow"><span class="k">Send reminder on</span><span class="v">'+fmt(nudgeDate(o))+'</span></div>';
-  rows+='<div class="detrow"><span class="k">Close it after</span><span class="v">'+fmt(closeDate(o))+'</span></div>';
-  if(o.editorName||o.editorEmail) rows+='<div class="detrow"><span class="k">Editor</span><span class="v">'+esc(o.editorName||"—")+(o.editorEmail?'<br><span style="font-weight:500;font-size:12.5px;color:var(--dim)">'+esc(o.editorEmail)+'</span>':"")+'</span></div>';
-  if(o.wordCount||o.pay) rows+='<div class="detrow"><span class="k">Length / pay</span><span class="v">'+esc(o.wordCount||"—")+(o.pay?" · "+esc(o.pay):"")+'</span></div>';
-  if(o.payMethod) rows+='<div class="detrow"><span class="k">Payment method</span><span class="v">'+esc(o.payMethod)+'</span></div>';
-  if(o.aiPolicy) rows+='<div class="detrow"><span class="k">🤖 AI policy</span><span class="v">'+esc(o.aiPolicy)+'</span></div>';
-  if(o.publishedLink) rows+='<div class="detrow"><span class="k">Published</span><span class="v"><a href="'+esc(o.publishedLink)+'" target="_blank" rel="noopener">link ↗</a></span></div>';
-  h+=rows;
-  h+='<div class="note"><b>💡 The idea:</b> '+esc(o.claim||"—")+'</div>';
-  if(o.kit) h+='<div class="note"><b>📦 Your material (only these scenes):</b> '+esc(o.kit)+'</div>';
-  if(o.offLimits) h+='<div class="note"><b>🚫 Don\'t use (belongs to another story):</b> '+esc(o.offLimits)+'</div>';
-  if(o.notes) h+='<div class="note"><b>📝 Notes:</b> '+esc(o.notes)+'</div>';
-  if(o.log&&o.log.length){
-    h+='<div class="log">'+o.log.slice().reverse().map(function(l){return '<div><span class="d">'+fmt(l.d)+'</span>'+esc(l.e)+'</div>';}).join("")+'</div>';
-  }
-  h+='<div class="bigbtns"><button class="bbtn blue" data-act="edit" data-id="'+o.id+'">✏️ Edit this pitch</button></div>';
+function entryHtml(o){
+  var h='<div class="entry">';
+  h+='<div class="e-date">'+(o.pitchDate?'<b>'+fmt(o.pitchDate)+'</b>pitched':'<b>—</b>not sent yet')+'</div>';
+  h+='<div><div class="e-name">'+(o.website?'<a href="'+esc(o.website)+'" target="_blank" rel="noopener">'+esc(o.name)+'</a>':esc(o.name))+
+     ' <span style="font-size:12px;color:var(--faint);font-style:italic">'+esc(o.type||"")+'</span></div>';
+  if(o.claim) h+='<div class="e-claim">“'+esc(o.claim)+'”</div>';
+  h+=metaLine(o);
+  h+='<details><summary><span class="micro">▸ open the record</span></summary><div class="det">';
+  h+=detRow("Status",ST_LINE[o.status]);
+  h+=detRow("Idea",o.claim);
+  h+=detRow("My material",o.kit&&(Array.isArray(o.kit)?o.kit.join(" · "):o.kit));
+  h+=detRow("Off limits",o.offLimits&&(Array.isArray(o.offLimits)?o.offLimits.join(" · "):o.offLimits));
+  h+=detRow("Editor",(o.editorName||"")+(o.editorEmail?" · "+o.editorEmail:""));
+  h+=detRow("Length / pay",(o.wordCount||"")+(o.pay?" · "+o.pay:""));
+  h+=detRow("Payment",o.payMethod);
+  h+=detRow("Reminder due",o.pitchDate?fmt(addDays(o.pitchDate,o.nudgeDays||21)):"");
+  h+=detRow("Close after",o.pitchDate?fmt(addDays(o.pitchDate,o.closeDays||42)):"");
+  h+=detRow("Story box",o.box);
+  h+=detRow("Notes",o.notes);
+  h+=detRow("Published",o.publishedLink?'<a href="'+esc(o.publishedLink)+'" target="_blank" rel="noopener">read it ↗</a>':"");
+  h+=logHtml(o);
+  h+=actionButtons(o);
   h+='</div></details></div>';
+  h+=dayBlock(o); h+=stamp(o);
+  h+='</div>';
   return h;
 }
 
-/* ================= RENDER: DRAFTS ================= */
-function renderDrafts(){
-  var el=document.getElementById("tab-drafts");
-  if(state._openDraft){ renderDraftEditor(state._openDraft); return; }
-  var total=0; state.drafts.forEach(function(d){ total+=wordCount(d.text); });
-  var h='<h2>📝 Drafts <span class="count">'+state.drafts.length+' · '+total+' words</span></h2>';
-  h+='<div class="note" style="margin-bottom:12px"><b>Your big box:</b> paste anything here — drafts, notes, whole essays. It saves itself as you type.</div>';
-  h+='<button class="bbtn green" data-act="newdraft" style="width:100%;margin-bottom:14px">＋ New draft</button>';
-  if(!state.drafts.length) h+='<div class="empty">No drafts yet. Click "＋ New draft" and paste something.</div>';
-  state.drafts.slice().sort(function(a,b){return (b.updated||"").localeCompare(a.updated||"");}).forEach(function(d){
-    h+='<div class="card"><div class="cardrow"><div style="min-width:0"><div class="cardtitle">'+esc(d.title||"Untitled")+'</div><div class="sub" style="font-size:12.5px;color:var(--dim)">'+wordCount(d.text)+' words · edited '+fmt(d.updated)+(d.outlet?' · 🏷 '+esc(d.outlet):"")+'</div></div></div><div class="bigbtns"><button class="bbtn blue" data-act="opendraft" data-id="'+d.id+'">✏️ Open</button><button class="bbtn red" style="flex:0 0 auto;min-width:64px" data-act="deletedraft" data-id="'+d.id+'">🗑</button></div></div>';
+/* ================= TODAY ================= */
+function statsCalc(){
+  var sent=state.outlets.filter(function(o){return o.pitchDate;}).length;
+  var waiting=state.outlets.filter(function(o){return ACTIVE.indexOf(o.status)>-1;}).length;
+  var yes=state.outlets.filter(function(o){return ["YES","PUBLISHED","PAID"].indexOf(o.status)>-1;}).length;
+  var pub=state.outlets.filter(function(o){return ["PUBLISHED","PAID"].indexOf(o.status)>-1;}).length;
+  var tasksLeft=(state.tasks||[]).filter(function(t){return !t.done;}).length;
+  return {sent:sent,waiting:waiting,yes:yes,pub:pub,tasksLeft:tasksLeft};
+}
+function renderToday(){
+  var st=statsCalc();
+  var h='<div class="stats">'
+    +'<div class="stat"><b>'+st.sent+'</b><span class="micro">pitches sent</span></div>'
+    +'<div class="stat"><b>'+st.waiting+'</b><span class="micro">waiting now</span></div>'
+    +'<div class="stat"><b>'+st.yes+'</b><span class="micro">accepted</span></div>'
+    +'<div class="stat"><b>'+st.pub+'</b><span class="micro">published</span></div>'
+    +'<div class="stat"><b>'+st.tasksLeft+'</b><span class="micro">to-do left</span></div></div>';
+
+  var needs=[];
+  state.outlets.forEach(function(o){
+    var d=daysOut(o);
+    if(o.pitchDate&&ACTIVE.indexOf(o.status)>-1){
+      if(d>=(o.closeDays||42)) needs.push({act:"Close it",what:esc(o.name)+" — "+d+" days out, past its close date ( "+ST_LABEL[o.status]+" )",id:o.id});
+      else if(o.status==="PITCHED"&&d>=(o.nudgeDays||21)) needs.push({act:"Send reminder",what:esc(o.name)+" — promised nudge was "+fmt(addDays(o.pitchDate,o.nudgeDays||21)),id:o.id});
+      else if(o.status==="NUDGED1"&&d>=(o.nudgeDays||21)*2) needs.push({act:"Last reminder",what:esc(o.name)+" — two nudge windows have passed",id:o.id});
+    }
+    if(o.status==="YES"&&!o.publishedLink) needs.push({act:"Write & send",what:esc(o.name)+" said YES — finish the piece and deliver"});
+    if(o.status==="PUBLISHED") needs.push({act:"Chase payment",what:esc(o.name)+" — published. Money should follow"});
+    if(o.status==="PITCHED"&&!o.pitchDate&&o.box==="OPEN") needs.push({act:"Pitch it",what:esc(o.name)+" — box is open, no pitch sent yet"});
   });
-  el.innerHTML=h;
-}
-function renderDraftEditor(id){
-  var d=state.drafts.find(function(x){return x.id===id;});
-  if(!d){ state._openDraft=null; renderDrafts(); return; }
-  var el=document.getElementById("tab-drafts");
-  var h='<h2>📝 Writing</h2>';
-  h+='<div class="bigbtns" style="margin-bottom:10px"><button class="bbtn gray" data-act="backdrafts">← Back</button><button class="bbtn green" data-act="copydraft" data-id="'+d.id+'">📋 Copy all</button><button class="bbtn red" data-act="deletedraft" data-id="'+d.id+'">🗑 Delete</button></div>';
-  h+='<div class="card"><div class="detrow"><span class="k">Title</span></div><input class="inline-input" id="d_title" style="width:100%;margin-bottom:10px" value="'+esc(d.title)+'">';
-  h+='<div class="detrow"><span class="k">Outlet tag (optional)</span></div><input class="inline-input" id="d_outlet" style="width:100%;margin-bottom:10px" value="'+esc(d.outlet||"")+'">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="hint" id="d_stats">'+wordCount(d.text)+' words</span><span class="hint" id="d_saved">saved '+fmt(d.updated)+'</span></div>';
-  h+='<textarea id="d_text" placeholder="Paste your draft here… it saves itself.">'+esc(d.text)+'</textarea></div>';
-  el.innerHTML=h;
-  var ta=document.getElementById("d_text"), ti=document.getElementById("d_title"), oi=document.getElementById("d_outlet"), timer=null;
-  function saveNow(){
-    d.title=ti.value; d.outlet=oi.value; d.text=ta.value; d.updated=todayISO(); save(state);
-    var st=document.getElementById("d_stats"); if(st) st.textContent=wordCount(d.text)+" words";
-    var sv=document.getElementById("d_saved"); if(sv) sv.textContent="saved "+new Date().toLocaleTimeString();
-  }
-  function debounce(){ clearTimeout(timer); timer=setTimeout(saveNow,600); }
-  ta.addEventListener("input",debounce); ti.addEventListener("input",debounce); oi.addEventListener("input",debounce);
-}
-function copyDraft(id){
-  var d=state.drafts.find(function(x){return x.id===id;}); if(!d) return;
-  var txt=d.text||"";
-  function fb(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); toast("Copied ✓"); }catch(e){ toast("Copy failed — select text manually"); } t.remove(); }
-  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Copied to clipboard ✓");},fb); } else { fb(); }
+  h+='<div class="shead"><span class="micro">Needs you now</span><span class="cnt">'+(needs.length?needs.length+" thing"+(needs.length===1?"":"s"):"all quiet")+'</span></div>';
+  h+=needs.length?needs.map(function(n){ return '<div class="need"><span class="n-act micro" style="color:var(--accent)">'+esc(n.act)+'</span><span class="n-what">'+n.what+'</span></div>'; }).join("")
+    :'<p class="empty">Nothing is due. Write something new while you wait.</p>';
+
+  var quiet=state.outlets.filter(function(o){ return o.pitchDate&&ACTIVE.indexOf(o.status)>-1&&daysOut(o)<(o.nudgeDays||21); });
+  h+='<div class="shead"><span class="micro">Waiting quietly</span><span class="cnt">'+quiet.length+'</span></div>';
+  h+=quiet.length?quiet.map(function(o){ return '<div class="need"><span class="n-act micro">'+fmt(o.pitchDate)+'</span><span class="n-what">'+esc(o.name)+' <i style="color:var(--faint)">— reminder '+fmt(addDays(o.pitchDate,o.nudgeDays||21))+'</i></span><span class="n-day">day '+daysOut(o)+'</span></div>'; }).join("")
+    :'<p class="empty">No live pitches waiting. The ledger is hungry — send one.</p>';
+
+  h+='<div class="shead"><span class="micro">This week\'s rules</span></div>';
+  h+=(state.tasks||[]).map(function(t,i){ return '<div class="task'+(t.done?" done":"")+'"><input type="checkbox" data-task="'+i+'"'+(t.done?" checked":"")+'><span>'+esc(t.t)+'</span></div>'; }).join("");
+  return h;
 }
 
-/* ================= RENDER: IDEAS ================= */
-var oppFilter=0;
-function renderOpps(){
-  var el=document.getElementById("tab-opps");
-  var h='<h2>💡 Ideas <span class="count">'+state.opps.length+'</span></h2>';
-  h+='<div class="note" style="margin-bottom:12px"><b>Where else to publish.</b> Tier 1 = do this week. Tier 2 = pitch when ready. Tier 3 = once you have clips.</div>';
-  h+='<div class="filters">';
-  [["0","All"],["1","Tier 1 — do this week"],["2","Tier 2 — pitch when ready"],["3","Tier 3 — later"]].forEach(function(f){
-    var n=state.opps.filter(function(o){return String(o.tier)===f[0];}).length;
-    h+='<button class="fchip'+(String(oppFilter)===f[0]?" on":"")+'" data-oppfilter="'+f[0]+'">'+f[1]+' ('+n+')</button>';
+/* ================= LEDGER ================= */
+function renderLedger(){
+  var f=ledgerFilter;
+  var list=state.outlets.slice().sort(function(a,b){ return (b.pitchDate||"9999")<(a.pitchDate||"9999")?-1:1; });
+  if(f!=="ALL") list=list.filter(function(o){ return o.status===f; });
+  var chips='<div class="chips"><button class="fchip'+(f==="ALL"?" on":"")+'" data-filter="ALL">All ('+state.outlets.length+')</button>';
+  STATUS.forEach(function(s){ var n=state.outlets.filter(function(o){return o.status===s;}).length; if(n) chips+='<button class="fchip'+(f===s?" on":"")+'" data-filter="'+s+'">'+ST_LABEL[s]+" ("+n+')</button>'; });
+  chips+='</div>';
+  return chips+list.map(entryHtml).join("")||chips;
+}
+
+/* ================= BOXES ================= */
+function renderBoxes(){
+  var h='<p class="empty" style="padding-top:0">Each story owns its scenes. What is in one box may not appear in another — this is how one life becomes many paid stories.</p>';
+  (state.boxes||[]).forEach(function(bx){
+    var cls=bx.status==="OPEN"?"openb":bx.status==="PAUSED"?"paused":"sealed";
+    h+='<div class="boxcard '+cls+'"><div style="display:flex;justify-content:space-between;gap:10px"><h3>'+esc(bx.name)+'</h3><span class="micro">'+esc(bx.status||"")+'</span></div>';
+    if(bx.claim) h+='<div class="e-claim">“'+esc(bx.claim)+'”</div>';
+    if(bx.kit&&bx.kit.length){ h+='<div class="boxkit micro" style="margin-top:8px">In this box</div><ul class="boxkit">'+bx.kit.map(function(k){return "<li>"+esc(k)+"</li>";}).join("")+'</ul>'; }
+    if(bx.offLimits&&bx.offLimits.length){ h+='<div class="boxkit micro">Belongs to other stories — never use here</div><ul class="boxkit">'+bx.offLimits.map(function(k){return "<li>"+esc(k)+"</li>";}).join("")+'</ul>'; }
+    h+='<div class="bigbtns"><button class="bbtn gray" data-act="editbox" data-id="'+esc(bx.id)+'">✏️ Edit</button></div></div>';
   });
-  h+='</div>';
-  var tiers=oppFilter?[oppFilter]:[1,2,3];
-  var stc={"not-started":"Not started","pitched":"Pitched","accepted":"Accepted","declined":"Declined","done":"Done"};
-  tiers.forEach(function(t){
-    var list=state.opps.filter(function(o){return o.tier===t;});
-    if(!list.length) return;
-    h+='<div class="tier">'+(t===1?"Tier 1 — do this week":t===2?"Tier 2 — pitch when ready":"Tier 3 — once you have clips")+'</div>';
-    list.forEach(function(o){
-      h+='<div class="card opp"><div class="cardrow"><div style="min-width:0"><div class="opname">'+esc(o.name)+'</div><div class="opay">💰 '+esc(o.pay)+'</div></div><select data-oppstatus="'+o.id+'">'+Object.keys(stc).map(function(k){return '<option value="'+k+'"'+(o.status===k?" selected":"")+'>'+stc[k]+'</option>';}).join("")+'</select></div>';
-      h+='<details><summary><span class="arrow">▶</span> How to submit</summary><div class="det">';
-      if(o.link) h+='<div class="detrow"><span class="k">Website</span><span class="v"><a href="'+esc(o.link)+'" target="_blank" rel="noopener">open ↗</a></span></div>';
-      h+='<div class="note">'+esc(o.how)+(o.notes?"\n\n"+esc(o.notes):"")+'</div>';
-      h+='</div></details></div>';
+  h+='<div class="bigbtns"><button class="bbtn" data-act="newbox">＋ New story box</button></div>';
+  return h;
+}
+
+/* ================= OPPS ================= */
+function renderOpps(){
+  var h='<p class="empty" style="padding-top:0">Places to publish and earn — no gatekeeper needed. Tier 1 is fastest.</p>';
+  var tiers={};
+  (state.opps||[]).forEach(function(o){ (tiers[o.tier||3]=tiers[o.tier||3]||[]).push(o); });
+  Object.keys(tiers).sort().forEach(function(t){
+    h+='<div class="shead"><span class="micro">Tier '+t+'</span><span class="cnt">'+tiers[t].length+'</span></div>';
+    tiers[t].forEach(function(o){
+      h+='<div class="opp"><div class="o-tier">'+t+'</div><div class="o-body"><div class="o-name">'
+        +(o.link?'<a href="'+esc(o.link)+'" target="_blank" rel="noopener">'+esc(o.name)+'</a>':esc(o.name))
+        +(o.status==="started"?' <span class="micro" style="color:var(--green)">· started</span>':o.status==="earned"?' <span class="micro" style="color:var(--gold)">· earned ✓</span>':"")
+        +'</div><div class="o-pay">'+esc(o.pay||"")+'</div>'+(o.how?'<div class="o-note">'+esc(o.how)+'</div>':"")+(o.notes?'<div class="o-note" style="color:var(--faint)">'+esc(o.notes)+'</div>':"")
+        +'</div><button class="bbtn gray" data-act="opp" data-id="'+esc(o.id)+'">→</button></div>';
     });
   });
-  el.innerHTML=h;
-}
-
-/* ================= RENDER: SETTINGS ================= */
-function renderSettings(){
-  var el=document.getElementById("tab-settings");
-  var total=state.outlets.length;
-  var yes=state.outlets.filter(function(o){return o.status==="YES";}).length;
-  var pub=state.outlets.filter(function(o){return ["PUBLISHED","PAID"].includes(o.status);}).length;
-  var paid=state.outlets.filter(function(o){return o.status==="PAID";}).length;
-  var h='<h2>⚙️ Settings</h2>';
-  h+='<div class="statgrid"><div class="stat"><div class="n">'+total+'</div><div class="t">Pitches sent</div></div><div class="stat"><div class="n">'+yes+'</div><div class="t">Accepted 🎉</div></div><div class="stat"><div class="n">'+pub+'</div><div class="t">Published 📄</div></div><div class="stat"><div class="n">'+paid+'</div><div class="t">Paid 💰</div></div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">✏️ App name</div><div class="field"><input id="setName" value="'+esc(state.appName)+'"></div><button class="bbtn green" data-act="savename">Save name</button></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">💾 Back up your data</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px">Everything lives on your phone. Export a file to keep it safe; import to restore it on another phone.</p><div class="bigbtns"><button class="bbtn green" data-act="export">⬇ Export backup</button><label class="bbtn blue" style="display:inline-block;text-align:center">⬆ Import backup<input type="file" id="importFile" accept=".json" style="display:none"></label></div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">🔄 Update issues?</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px">If the app looks old or new entries are missing, tap this button — it clears the old saved copy, refreshes the app, and pulls in the latest entries (your pitches and edits are kept).</p><button class="bbtn amber" data-act="forceupdate">🔄 Force update app</button></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">🧹 Start over</div><p style="font-size:14px;color:var(--dim);margin-bottom:10px"><b>Wipe:</b> clears everything — use before sharing the app, or for a fresh start. <b>Reset:</b> back to the original examples.</p><div class="bigbtns"><button class="bbtn red" data-act="wipe">🧹 Wipe everything</button><button class="bbtn gray" data-act="reset">↩️ Reset examples</button></div></div>';
-  h+='<div class="card"><div class="cardtitle" style="margin-bottom:10px">📖 What is this app?</div><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>My Pitches</b> — every place you sent a story. The big number = days until you send a polite reminder. Red = do it now.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Drafts</b> — paste any writing here; it saves itself.</p><p style="font-size:14px;color:var(--dim);margin-bottom:6px"><b>Ideas</b> — new places to publish, with pay and how to submit.</p><p style="font-size:14px;color:var(--dim)"><b>Material rule</b> — each story has its own scenes. A scene used in one story stays out of the others (that\'s the whole secret of your portfolio).</p></div>';
-  el.innerHTML=h;
-}
-
-/* ================= MODAL (add/edit pitch) ================= */
-function outletForm(o){
-  o=o||{};
-  function f(n){ return o[n]==null?"":esc(o[n]); }
-  var h='<div class="modal-box"><h3>'+(o.id?"Edit pitch":"New pitch")+'</h3>';
-  h+='<div class="field"><label>Publication name *</label><input id="f_name" value="'+f("name")+'" placeholder="e.g. TechCabal"></div>';
-  h+='<div class="field"><label>Website</label><input id="f_website" value="'+f("website")+'" placeholder="https://…"></div>';
-  h+='<div class="field"><label>Status</label><select id="f_status">'+STATUS.map(function(s){return '<option'+(o.status===s?" selected":"")+'>'+s+'</option>';}).join("")+'</select></div>';
-  h+='<div class="field"><label>Story folder</label><select id="f_box">'+["OPEN","SEALED","PAUSED","CLOSED"].map(function(b){return '<option'+(o.box===b?" selected":"")+'>'+b+'</option>';}).join("")+'</select><div class="hint">Ready to write = open · Wait for their yes = sealed · On hold = paused</div></div>';
-  h+='<div class="field"><label>Date you pitched</label><input type="date" id="f_pitch" value="'+f("pitchDate")+'"><div class="hint">This starts the countdown.</div></div>';
-  h+='<div class="field"><label>Send reminder after (days)</label><input type="number" id="f_nudge" min="1" value="'+(o.nudgeDays||21)+'"></div>';
-  h+='<div class="field"><label>Close it after (days)</label><input type="number" id="f_close" min="1" value="'+(o.closeDays||42)+'"></div>';
-  h+='<div class="field"><label>Editor name</label><input id="f_editor" value="'+f("editorName")+'"></div>';
-  h+='<div class="field"><label>Editor email</label><input id="f_email" value="'+f("editorEmail")+'"></div>';
-  h+='<div class="field"><label>The idea (one sentence)</label><textarea id="f_claim">'+f("claim")+'</textarea></div>';
-  h+='<div class="field"><label>Your material (scenes only this story can use)</label><textarea id="f_kit">'+f("kit")+'</textarea></div>';
-  h+='<div class="field"><label>Don\'t use (belongs to another story)</label><textarea id="f_off">'+f("offLimits")+'</textarea></div>';
-  h+='<div class="field"><label>Length</label><input id="f_words" value="'+f("wordCount")+'"></div>';
-  h+='<div class="field"><label>Pay</label><input id="f_pay" value="'+f("pay")+'"></div>';
-  h+='<div class="field"><label>Payment method</label><input id="f_method" value="'+f("payMethod")+'"></div>';
-  h+='<div class="field"><label>🤖 AI policy</label><input id="f_ai" value="'+f("aiPolicy")+'" placeholder="e.g. No AI-generated work accepted"><div class="hint">Checked and verified per outlet — editors test for this.</div></div>';
-  h+='<div class="field"><label>Published link</label><input id="f_publink" value="'+f("publishedLink")+'"></div>';
-  h+='<div class="field"><label>Notes</label><textarea id="f_notes">'+f("notes")+'</textarea></div>';
-  h+='<div class="modal-actions"><button class="bbtn green" data-act="saveoutlet" data-id="'+f("id")+'">💾 Save</button><button class="bbtn gray" data-act="closemodal">Cancel</button></div>';
-  h+='</div>';
   return h;
 }
+
+/* ================= DRAFTS ================= */
+function renderDrafts(){
+  if(curDraft){
+    var d=state.drafts.find(function(x){return x.id===curDraft;});
+    if(d){ var wc=(d.text||"").trim()?((d.text||"").trim().split(/\s+/).length):0;
+      return '<div class="shead"><span class="micro">'+esc(d.title||"Untitled draft")+'</span></div>'
+        +'<div class="field"><input id="d_title" value="'+esc(d.title)+'" placeholder="Draft title"></div>'
+        +'<textarea class="darea" id="d_text" placeholder="Write here…">'+esc(d.text)+'</textarea>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center"><div class="wc" id="wc">'+wc+' words · saved '+fmt(d.updated)+'</div>'
+        +'<div class="bigbtns" style="margin:0"><button class="bbtn" data-act="copydraft">⧉ Copy</button><button class="bbtn gray" data-act="closedraft">← All drafts</button><button class="bbtn red" data-act="deldraft">Delete</button></div></div>';
+    }
+  }
+  var h='<div class="shead"><span class="micro">Drafts pad</span><span class="cnt">'+state.drafts.length+'</span></div>';
+  h+=state.drafts.map(function(d){
+    var t=(d.text||"").trim();
+    var wc=t?t.split(/\s+/).length+" words \u00b7 ":"";
+    return '<div class="draftrow" data-act="opendraft" data-id="'+esc(d.id)+'"><span class="d-title">'+esc(d.title||"Untitled")+'</span><span class="d-meta">'+wc+fmt(d.updated)+'</span></div>';
+  }).join("");
+  h+='<div class="bigbtns"><button class="bbtn green" data-act="newdraft">＋ New draft</button></div>';
+  return h;
+}
+function saveDraftNow(){
+  var d=state.drafts.find(function(x){return x.id===curDraft;}); if(!d) return;
+  var t=document.getElementById("d_title"), x=document.getElementById("d_text"); if(!t||!x) return;
+  d.title=t.value; d.text=x.value; d.updated=todayISO(); save(state);
+  var wc=document.getElementById("wc"); if(wc) wc.textContent=(d.text.trim()?d.text.trim().split(/\s+/).length:0)+" words · saved just now";
+}
+
+/* ================= SETTINGS ================= */
+function renderSettings(){
+  var st=statsCalc();
+  var h='<div class="shead"><span class="micro">The numbers</span></div><div class="stats">'
+    +'<div class="stat"><b>'+state.outlets.length+'</b><span class="micro">outlets</span></div>'
+    +'<div class="stat"><b>'+st.sent+'</b><span class="micro">pitched</span></div>'
+    +'<div class="stat"><b>'+st.waiting+'</b><span class="micro">waiting</span></div>'
+    +'<div class="stat"><b>'+st.yes+'</b><span class="micro">accepted</span></div></div>';
+  h+='<div class="shead"><span class="micro">This journal</span></div>';
+  h+='<div class="field"><label class="micro">Journal name</label><input id="appname" value="'+esc(state.appName||"PitchLedger")+'"><div class="hint">Changes the masthead.</div></div>';
+  h+='<div class="bigbtns"><button class="bbtn" data-act="saveapp">Save name</button>'
+    +'<button class="bbtn" data-act="export">⬇ Export backup</button>'
+    +'<button class="bbtn" data-act="import">⬆ Import backup</button>'
+    +'<button class="bbtn gray" data-act="forceupdate">Force update</button>'
+    +'<button class="bbtn red" data-act="reset">Reset to examples</button>'
+    +'<button class="bbtn red" data-act="wipe">Wipe everything</button></div>';
+  h+='<input type="file" id="importfile" accept="application/json" style="display:none">';
+  h+='<p class="hint" style="margin-top:14px">Everything lives on this device (offline). Export a backup before switching phones. Added to Home Screen, it works as an app.</p>';
+  return h;
+}
+
+/* ================= MODALS ================= */
 function openModal(html){ var m=document.getElementById("modal"); m.innerHTML=html; m.classList.add("on"); }
 function closeModal(){ document.getElementById("modal").classList.remove("on"); }
+function field(n,label,val,ph,hint,type){ return '<div class="field"><label class="micro">'+label+'</label><input '+(type||'')+' id="'+n+'" value="'+esc(val==null?"":val)+'" placeholder="'+esc(ph||"")+'">'+(hint?'<div class="hint">'+hint+'</div>':"")+'</div>'; }
+function area(n,label,val,ph){ return '<div class="field"><label class="micro">'+label+'</label><textarea id="'+n+'" placeholder="'+esc(ph||"")+'">'+esc(val==null?"":val)+'</textarea></div>'; }
+function outletForm(o){
+  o=o||{};
+  var h='<div class="modal-box"><h3>'+(o.id?"Edit — "+esc(o.name):"A new pitch")+'</h3>';
+  h+=field("f_name","Publication *",o.name,"e.g. TechCabal");
+  h+=field("f_website","Website",o.website,"https://…");
+  h+='<div class="field"><label class="micro">Status</label><select id="f_status">'+STATUS.map(function(s){return '<option'+(o.status===s?" selected":"")+' value="'+s+'">'+ST_LABEL[s]+'</option>';}).join("")+'</select></div>';
+  h+='<div class="field"><label class="micro">Story box</label><select id="f_box">'+["OPEN","SEALED","PAUSED","CLOSED"].map(function(b){return '<option'+(o.box===b?" selected":"")+'>'+b+'</option>';}).join("")+'</select><div class="hint">Open = ready to write · Sealed = waiting on a yes</div></div>';
+  h+=field("f_pitch","Date pitched",o.pitchDate,"","This starts the day counter.",'type="date"');
+  h+=field("f_nudge","Reminder after (days)",o.nudgeDays==null?21:o.nudgeDays,"21",'type="number" min="1"');
+  h+=field("f_close","Close it after (days)",o.closeDays==null?42:o.closeDays,"42",'type="number" min="1"');
+  h+=field("f_editor","Editor",o.editorName,"name");
+  h+=field("f_email","Editor email",o.editorEmail,"");
+  h+=area("f_claim","The idea (one sentence)",o.claim,"What this story argues");
+  h+=area("f_kit","My material for this story",o.kit&&o.kit.join?o.kit.join("\n"):o.kit,"Scenes only this story can use");
+  h+=area("f_off","Off limits (belongs to other stories)",o.offLimits&&o.offLimits.join?o.offLimits.join("\n"):o.offLimits,"");
+  h+=field("f_words","Length",o.wordCount,"e.g. 1,000–1,500");
+  h+=field("f_pay","Pay",o.pay,"e.g. ₦150,000");
+  h+=field("f_method","Payment method",o.payMethod,"");
+  h+=field("f_ai","🤖 AI policy",o.aiPolicy,"checked per outlet");
+  h+=field("f_publink","Published link",o.publishedLink,"https://…");
+  h+=area("f_notes","Notes",o.notes,"");
+  h+='<div class="modal-actions"><button class="bbtn green" data-act="saveoutlet" data-id="'+esc(o.id||"")+'">Save entry</button><button class="bbtn gray" data-act="closemodal">Cancel</button></div></div>';
+  return h;
+}
+function boxForm(b){
+  b=b||{};
+  var h='<div class="modal-box"><h3>'+(b.id?"Edit — "+esc(b.name):"New story box")+'</h3>';
+  h+=field("b_name","Story name *",b.name,"e.g. The Phone-Coding Essay");
+  h+='<div class="field"><label class="micro">Status</label><select id="b_status">'+["OPEN","SEALED","PAUSED","CLOSED"].map(function(s){return '<option'+(b.status===s?" selected":"")+'>'+s+'</option>';}).join("")+'</select></div>';
+  h+=area("b_claim","The claim",b.claim,"");
+  h+=area("b_kit","In this box (one per line)",b.kit&&b.kit.join?b.kit.join("\n"):b.kit,"");
+  h+=area("b_off","Off limits (one per line)",b.offLimits&&b.offLimits.join?b.offLimits.join("\n"):b.offLimits,"");
+  h+='<div class="modal-actions"><button class="bbtn green" data-act="savebox" data-id="'+esc(b.id||"")+'">Save box</button><button class="bbtn gray" data-act="closemodal">Cancel</button></div></div>';
+  return h;
+}
 
 /* ================= ACTIONS ================= */
+function toast(m){ var t=document.getElementById("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(t._x); t._x=setTimeout(function(){t.classList.remove("on");},2200); }
 function markStatus(id,to){
   var o=state.outlets.find(function(x){return x.id===id;}); if(!o) return;
-  o.status=to;
-  var d=todayISO();
-  if(to==="NUDGED1") o.log.push({d:d,e:"Reminder #1 sent."});
-  if(to==="NUDGED2") o.log.push({d:d,e:"Reminder #2 sent."});
-  if(to==="YES") o.log.push({d:d,e:"THEY SAID YES 🎉."});
-  if(to==="NO") o.log.push({d:d,e:"No — material returns to the pool."});
-  if(to==="CLOSED") o.log.push({d:d,e:"Closed (no reply)."});
-  if(to==="PUBLISHED") o.log.push({d:d,e:"Published 📄."});
-  if(to==="PAID") o.log.push({d:d,e:"Paid 💰."});
-  if(to==="PAUSED") o.log.push({d:d,e:"On hold (by choice)."});
-  if(to==="PITCHED") o.log.push({d:d,e:"Reopened."});
-  save(state); renderAll();
+  o.status=to; o.log=o.log||[];
+  o.log.push({d:todayISO(),e:"Marked: "+ST_LABEL[to]+(to==="YES"?" 🎉":to==="PAID"?" 💰":"")});
+  save(state); renderAll(); toast(o.name+" → "+ST_LABEL[to]);
 }
 function saveOutlet(id){
-  function g(x){ return document.getElementById(x).value; }
+  function g(x){ var e=document.getElementById(x); return e?e.value:""; }
   var isNew=!id;
   var o=isNew?{id:"o"+Date.now(),log:[]}:state.outlets.find(function(x){return x.id===id;});
+  if(!o) return;
   o.name=g("f_name")||"Untitled"; o.website=g("f_website"); o.status=g("f_status"); o.box=g("f_box");
   o.pitchDate=g("f_pitch"); o.nudgeDays=parseInt(g("f_nudge"),10)||21; o.closeDays=parseInt(g("f_close"),10)||42;
-  o.editorName=g("f_editor"); o.editorEmail=g("f_email"); o.claim=g("f_claim"); o.kit=g("f_kit"); o.offLimits=g("f_off");
-  o.wordCount=g("f_words"); o.pay=g("f_pay"); o.payMethod=g("f_method"); o.aiPolicy=g("f_ai"); o.publishedLink=g("f_publink"); o.notes=g("f_notes");
-  if(isNew) state.outlets.push(o);
-  save(state); closeModal(); renderAll();
+  o.editorName=g("f_editor"); o.editorEmail=g("f_email"); o.claim=g("f_claim");
+  o.kit=g("f_kit"); o.offLimits=g("f_off");
+  o.wordCount=g("f_words"); o.pay=g("f_pay"); o.payMethod=g("f_method"); o.aiPolicy=g("f_ai");
+  o.publishedLink=g("f_publink"); o.notes=g("f_notes");
+  if(isNew){ o.log=[{d:todayISO(),e:"Entry opened in the journal."}]; state.outlets.push(o); }
+  save(state); closeModal(); renderAll(); toast("Saved ✓");
+}
+function saveBox(id){
+  function g(x){ var e=document.getElementById(x); return e?e.value:""; }
+  function lines(v){ return v?v.split("\n").map(function(x){return x.trim();}).filter(Boolean):[]; }
+  var isNew=!id;
+  var b=isNew?{id:"b"+Date.now()}:state.boxes.find(function(x){return x.id===id;});
+  if(!b) return;
+  b.name=g("b_name")||"Untitled box"; b.status=g("b_status"); b.claim=g("b_claim"); b.kit=lines(g("b_kit")); b.offLimits=lines(g("b_off"));
+  if(isNew) state.boxes.push(b);
+  save(state); closeModal(); renderAll(); toast("Box saved ✓");
 }
 function exportData(){
   var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
@@ -719,99 +524,69 @@ function exportData(){
 }
 function importData(file){
   var r=new FileReader();
-  r.onload=function(){
-    try{ var s=JSON.parse(r.result); if(!s.outlets) throw new Error("bad"); if(!s.drafts) s.drafts=[]; state=s; save(state); renderAll(); toast("Backup imported ✓"); }
-    catch(e){ toast("That file isn't a PitchLedger backup"); }
-  };
+  r.onload=function(){ try{ var s=JSON.parse(r.result); if(!s.outlets) throw 0;
+    if(!s.drafts)s.drafts=[]; state=s; save(state); renderAll(); toast("Backup imported ✓");
+  }catch(e){ toast("That file isn't a PitchLedger backup"); } };
   r.readAsText(file);
+}
+function oppCycle(id){
+  var o=state.opps.find(function(x){return x.id===id;}); if(!o) return;
+  o.status=o.status==="earned"?"not-started":o.status==="started"?"earned":"started";
+  save(state); renderAll();
 }
 
 /* ================= EVENTS ================= */
 document.addEventListener("click",function(e){
-  var t=e.target;
-  while(t&&!t.getAttribute("data-act")) t=t.parentElement;
-  if(!t) return;
+  var t=e.target.closest("[data-nav],[data-filter],[data-act],[data-new]"); if(!t) return;
+  if(t.hasAttribute("data-new")){ openModal(outletForm(null)); return; }
+  if(t.hasAttribute("data-nav")){ setView(t.getAttribute("data-nav")); return; }
+  if(t.hasAttribute("data-filter")){ ledgerFilter=t.getAttribute("data-filter"); renderAll(); return; }
   var act=t.getAttribute("data-act"), id=t.getAttribute("data-id");
-  if(act==="welcomedone"){ sset("welcomeSeen","1"); renderToday(); }
-  else if(act==="mark"){ markStatus(id,t.getAttribute("data-to")); }
-  else if(act==="edit"){ var o=state.outlets.find(function(x){return x.id===id;}); openModal(outletForm(o)); }
-  else if(act==="newoutlet"){ openModal(outletForm(null)); }
-  else if(act==="saveoutlet"){ saveOutlet(id); }
-  else if(act==="closemodal"){ closeModal(); }
-  else if(act==="export"){ exportData(); }
+  if(act==="st") markStatus(id,t.getAttribute("data-to"));
+  else if(act==="edit"){ openModal(outletForm(state.outlets.find(function(o){return o.id===id;}))); }
+  else if(act==="del"){ var o=state.outlets.find(function(x){return x.id===id;});
+    if(o&&confirm("Delete "+o.name+" from the journal?")){ state.outlets=state.outlets.filter(function(x){return x.id!==id;}); save(state); renderAll(); toast("Deleted"); } }
+  else if(act==="saveoutlet") saveOutlet(id||null);
+  else if(act==="editbox") openModal(boxForm(state.boxes.find(function(b){return b.id===id;})));
+  else if(act==="newbox") openModal(boxForm(null));
+  else if(act==="savebox") saveBox(id||null);
+  else if(act==="opp") oppCycle(id);
+  else if(act==="opendraft"){ curDraft=id; renderAll(); }
+  else if(act==="newdraft"){ var d={id:"d"+Date.now(),title:"",outlet:"",updated:todayISO(),text:""}; state.drafts.push(d); curDraft=d.id; save(state); renderAll(); setTimeout(function(){ var el=document.getElementById("d_title"); if(el) el.focus(); },50); }
+  else if(act==="closedraft"){ saveDraftNow(); curDraft=null; renderAll(); }
+  else if(act==="deldraft"){ if(confirm("Delete this draft?")){ state.drafts=state.drafts.filter(function(x){return x.id!==curDraft;}); curDraft=null; save(state); renderAll(); } }
+  else if(act==="copydraft"){ var d=state.drafts.find(function(x){return x.id===curDraft;});
+    if(d&&navigator.clipboard){ navigator.clipboard.writeText(d.text||"").then(function(){toast("Copied ✓");}); } }
+  else if(act==="saveapp"){ var i=document.getElementById("appname"); state.appName=i.value||"PitchLedger"; save(state); renderAll(); toast("Saved ✓"); }
+  else if(act==="export") exportData();
+  else if(act==="import"){ var f=document.getElementById("importfile"); if(f) f.click(); }
   else if(act==="reset"){ if(confirm("Reset to the original examples? This replaces your data.")){ state=seed(); save(state); renderAll(); toast("Reset to examples"); } }
-  else if(act==="wipe"){ if(confirm("Wipe EVERYTHING? Export a backup first if you want to keep anything.")){ state.outlets=[]; state.opps=[]; state.boxes=[]; state.tasks=[]; state.drafts=[]; state._openDraft=null; save(state); renderAll(); toast("Wiped — clean start"); } }
-  else if(act==="forceupdate"){
-    if(confirm("Force update: this clears the app's old cache and reloads. Your data is kept. Continue?")){
-      try{ if(navigator.serviceWorker){ navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } }catch(e){}
-      try{ if(window.caches){ caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); }); } }catch(e){}
-      try{ window.localStorage.removeItem("pitchledger_v1"); }catch(e){}
-      setTimeout(function(){ location.reload(); }, 500);
-    }
-  }
-  else if(act==="savename"){ var n=document.getElementById("setName").value; state.appName=n||"PitchLedger"; save(state); renderAll(); }
-  else if(act==="addtask"){ var inp=document.getElementById("newTask"); var v=(inp.value||"").trim(); if(v){ state.tasks.push({t:v,done:false}); save(state); renderAll(); } }
-  else if(act==="newdraft"){ var nd={id:"d"+Date.now(),title:"Untitled draft",outlet:"",updated:todayISO(),text:""}; state.drafts.push(nd); state._openDraft=nd.id; save(state); renderDrafts(); }
-  else if(act==="opendraft"){ state._openDraft=id; renderDrafts(); }
-  else if(act==="backdrafts"){ state._openDraft=null; renderDrafts(); }
-  else if(act==="deletedraft"){ var di=state.drafts.findIndex(function(x){return x.id===id;}); if(di>-1&&confirm("Delete this draft?")){ state.drafts.splice(di,1); if(state._openDraft===id) state._openDraft=null; save(state); renderDrafts(); toast("Draft deleted"); } }
-  else if(act==="copydraft"){ copyDraft(id); }
+  else if(act==="wipe"){ if(confirm("Wipe EVERYTHING? Export a backup first!")){ state={appName:"PitchLedger",outlets:[],opps:[],boxes:[],tasks:[],drafts:[]}; save(state); renderAll(); toast("Wiped"); } }
+  else if(act==="forceupdate"){ try{ if(navigator.serviceWorker){ navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){r.unregister();}); }); } }catch(e){} location.reload(true); }
+  else if(act==="closemodal") closeModal();
 });
 document.addEventListener("change",function(e){
-  if(e.target.id==="importFile"&&e.target.files.length){ importData(e.target.files[0]); e.target.value=""; }
-  var st=e.target.getAttribute("data-oppstatus");
-  if(st){ var o=state.opps.find(function(x){return x.id===st;}); if(o){ o.status=e.target.value; save(state); renderStats(); } }
-  var tk=e.target.getAttribute("data-task");
-  if(tk!==null){ state.tasks[+tk].done=e.target.checked; save(state); }
+  if(e.target.hasAttribute&&e.target.hasAttribute("data-task")){
+    var i=parseInt(e.target.getAttribute("data-task"),10);
+    if(state.tasks&&state.tasks[i]){ state.tasks[i].done=e.target.checked; save(state); renderAll(); }
+  }
+  var f=document.getElementById("importfile");
+  if(e.target===f&&f.files&&f.files[0]) importData(f.files[0]);
 });
 document.addEventListener("input",function(e){
-  if(e.target.id==="outletSearch"){ query=e.target.value; renderOutlets(); }
+  if(e.target.id==="d_text"||e.target.id==="d_title"){
+    clearTimeout(draftTimer); draftTimer=setTimeout(saveDraftNow,700);
+  }
 });
-document.addEventListener("click",function(e){
-  var f=e.target.getAttribute("data-filter");
-  if(f){ filter=f; renderOutlets(); }
-  var o=e.target.getAttribute("data-oppfilter");
-  if(o!==null){ oppFilter=+o; renderOpps(); }
-  var tb=e.target.getAttribute("data-tab");
-  if(tb){ switchTab(tb); }
-});
-function switchTab(name){
-  document.querySelectorAll(".tabbtn").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-tab")===name);});
-  document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("on",s.id==="tab-"+name);});
-}
-function renderAll(){
-  document.getElementById("appName").textContent=state.appName||"PitchLedger";
-  renderStats(); renderToday(); renderOutlets(); renderDrafts(); renderOpps(); renderSettings();
-}
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
+document.getElementById("modal").addEventListener("click",function(e){ if(e.target.id==="modal") closeModal(); });
+
+/* ================= BOOT ================= */
 state=load();
 renderAll();
-setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
-document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderStats(); renderToday(); renderOutlets(); } });
+setInterval(function(){ if(!document.getElementById("modal").classList.contains("on")) renderAll(); },60000);
+document.addEventListener("visibilitychange",function(){ if(!document.hidden&& !document.getElementById("modal").classList.contains("on")) renderAll(); });
 try{ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); } }catch(e){}
-</script>
-</body>
-</html>
-o=e.target.getAttribute("data-oppfilter");
-  if(o!==null){ oppFilter=+o; renderOpps(); }
-  var tb=e.target.getAttribute("data-tab");
-  if(tb){ switchTab(tb); }
-});
-function switchTab(name){
-  document.querySelectorAll(".tabbtn").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-tab")===name);});
-  document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("on",s.id==="tab-"+name);});
-}
-function renderAll(){
-  document.getElementById("appName").textContent=state.appName||"PitchLedger";
-  renderStats(); renderToday(); renderOutlets(); renderDrafts(); renderOpps(); renderSettings();
-}
-state=load();
-renderAll();
-setInterval(function(){ renderStats(); renderToday(); renderOutlets(); },60000);
-try{ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); } }catch(e){}
-</script>
-</body>
-</html>
-egister("sw.js").catch(function(){}); } }catch(e){}
 </script>
 </body>
 </html>
